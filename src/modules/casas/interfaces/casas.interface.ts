@@ -61,7 +61,7 @@ export interface Casa {
   reviewsCount: number;
   averageRating: number;
   userHasReviewed?: boolean;
-  imageUrls: string[];
+  imageUrls: ImageUrls[];
 }
 
 // Interfaz para Metadatos de paginación
