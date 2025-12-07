@@ -4,7 +4,7 @@
   >
     <a :href="`/casas/${casa.id}`">
       <div class="relative flex items-end overflow-hidden rounded-xl">
-        <img :src="casa.imageUrls[0]" :alt="casa.title" class="h-48 w-full object-cover" />
+        <img :src="casa.imageUrls[0]?.url" :alt="casa.title" class="h-48 w-full object-cover" />
         <div
           class="absolute bottom-3 left-3 inline-flex items-center rounded-lg bg-white p-2 shadow-md"
         >

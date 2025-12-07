@@ -6,18 +6,22 @@
       </a>
       <div class="mt-2 sm:mt-0 sm:flex md:order-2">
         <!-- Login Button -->
-        <button
-          type="button"
-          class="rounde mr-3 hidden border border-blue-700 py-1.5 px-6 text-center text-sm font-medium text-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 md:inline-block rounded-lg"
-        >
-          Login
-        </button>
-        <button
-          type="button"
-          class="rounde mr-3 hidden bg-blue-700 py-1.5 px-6 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 md:mr-0 md:inline-block rounded-lg"
-        >
-          Register
-        </button>
+        <RouterLink to="/auth/login">
+          <button
+            type="button"
+            class="rounde mr-3 hidden border border-blue-700 py-1.5 px-6 text-center text-sm font-medium text-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 md:inline-block rounded-lg"
+          >
+            Login
+          </button>
+        </RouterLink>
+        <RouterLink to="/auth/register">
+          <button
+            type="button"
+            class="rounded bg-blue-700 py-1.5 px-6 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 md:mr-0"
+          >
+            Register
+          </button>
+        </RouterLink>
         <!-- Register Button -->
         <button
           data-collapse-toggle="navbar-sticky"
@@ -83,3 +87,5 @@
     </div>
   </nav>
 </template>
+
+<script lang="ts" setup></script>
