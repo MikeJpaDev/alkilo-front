@@ -90,6 +90,12 @@
     </a>
   </div>
 
+  <FiltersSection
+    :filters="filters"
+    :provincias="provinciasList"
+    :municipios="municipiosByProvincia"
+  />
+
   <!-- component -->
   <div
     v-if="!casas"
@@ -103,19 +109,69 @@
   </div>
 
   <CasasList v-else :casas="casas.data" />
+
+  <BottonsPagination
+    v-if="casas"
+    :page="casas.meta.page"
+    :has-next="casas.meta.hasNext"
+    :has-prev="casas.meta.hasPrevious"
+  />
 </template>
 
 <script lang="ts" setup>
+import FiltersSection from '@/modules/casas/components/FiltersSection.vue';
 import { useQuery } from '@tanstack/vue-query';
 import { getCasasActions } from '../../casas/actions';
 import CasasList from '@/modules/casas/components/CasaList.vue';
+import BottonsPagination from '@/modules/common/components/BottonsPagination.vue';
+import { useRoute } from 'vue-router';
+import { ref, watch } from 'vue';
+
+const route = useRoute();
+const page = ref(Number(route.query.page) || 1);
 
 const { data: casas, isLoading } = useQuery({
-  queryKey: ['casas', { page: 1 }],
-  queryFn: () => getCasasActions(),
+  queryKey: ['casas', { page: page.value }],
+  queryFn: () => getCasasActions(page.value),
   staleTime: 1000 * 60 * 5, //5 minutos de refresco
 });
+// Datos de ejemplo
+const provinciasList = ref([
+  { id: 1, name: 'La Habana' },
+  { id: 2, name: 'Pinar del Río' },
+  { id: 3, name: 'Matanzas' },
+]);
 
-console.log(casas);
-getCasasActions();
+const municipiosByProvincia = ref({
+  1: [
+    { id: 1, name: 'Plaza de la Revolución' },
+    { id: 2, name: 'Centro Habana' },
+    { id: 3, name: 'Habana Vieja' },
+  ],
+  2: [
+    { id: 4, name: 'Pinar del Río' },
+    { id: 5, name: 'Viñales' },
+    { id: 6, name: 'San Luis' },
+  ],
+  3: [
+    { id: 7, name: 'Matanzas' },
+    { id: 8, name: 'Varadero' },
+    { id: 9, name: 'Cárdenas' },
+  ],
+});
+const filters = ref({
+  location: '',
+  minPrice: '',
+  maxPrice: '',
+  bedrooms: '',
+});
+
+watch(
+  () => route.query.page?.valueOf,
+  (newPage) => {
+    page.value = Number(newPage) || 1;
+    console.log('Page changed to:', page.value);
+  },
+  { immediate: true },
+);
 </script>

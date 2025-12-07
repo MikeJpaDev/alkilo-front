@@ -2,7 +2,7 @@
   <article
     class="rounded-xl bg-white p-3 shadow-lg hover:shadow-xl hover:transform hover:scale-105 duration-300"
   >
-    <a href="#">
+    <a :href="`/casas/${casa.id}`">
       <div class="relative flex items-end overflow-hidden rounded-xl">
         <img :src="casa.imageUrls[0]" :alt="casa.title" class="h-48 w-full object-cover" />
         <div
