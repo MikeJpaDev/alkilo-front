@@ -1,13 +1,17 @@
 <script lang="ts" setup>
 import { useQuery } from '@tanstack/vue-query';
 import { useRoute, useRouter } from 'vue-router';
-import { computed } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { getCasaActions } from '../actions/get-casa.actions';
 import type { Casa } from '../interfaces/casas.interface';
 
 const router = useRouter();
 const route = useRoute();
 const houseId = route.params.id as string;
+
+// Estado para el carrusel de imágenes
+const currentImageIndex = ref(0);
+let carouselInterval: number | null = null;
 
 // Consulta para obtener los datos de la casa
 const {
@@ -25,9 +29,9 @@ console.log('House data:', house);
 // Computed para el badge de rating
 const ratingBadgeClass = computed(() => {
   const rating = house.value?.averageRating || 0;
-  if (rating >= 4.5) return 'bg-green-100 text-green-800';
-  if (rating >= 3.5) return 'bg-yellow-100 text-yellow-800';
-  return 'bg-red-100 text-red-800';
+  if (rating >= 4.5) return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+  if (rating >= 3.5) return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+  return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
 });
 
 // Función para formatear fecha
@@ -52,6 +56,49 @@ const handleContact = () => {
     alert(`Contactando a ${contact.name} al ${contact.number}...`);
   }
 };
+
+// Funciones del carrusel
+const nextImage = () => {
+  if (house.value?.imageUrls && house.value.imageUrls.length > 0) {
+    currentImageIndex.value = (currentImageIndex.value + 1) % house.value.imageUrls.length;
+  }
+};
+
+const prevImage = () => {
+  if (house.value?.imageUrls && house.value.imageUrls.length > 0) {
+    currentImageIndex.value = currentImageIndex.value === 0
+      ? house.value.imageUrls.length - 1
+      : currentImageIndex.value - 1;
+  }
+};
+
+const goToImage = (index: number) => {
+  currentImageIndex.value = index;
+};
+
+// Iniciar carrusel automático (1 segundo)
+const startCarousel = () => {
+  if (house.value?.imageUrls && house.value.imageUrls.length > 1) {
+    carouselInterval = window.setInterval(nextImage, 1000); // Cambiar cada 1 segundo
+  }
+};
+
+// Detener carrusel automático
+const stopCarousel = () => {
+  if (carouselInterval) {
+    clearInterval(carouselInterval);
+    carouselInterval = null;
+  }
+};
+
+// Lifecycle hooks
+onMounted(() => {
+  startCarousel();
+});
+
+onUnmounted(() => {
+  stopCarousel();
+});
 </script>
 
 <template>
@@ -98,32 +145,82 @@ const handleContact = () => {
 
       <!-- Contenido principal -->
       <div v-else-if="house" class="grid lg:grid-cols-3 gap-8">
-        <!-- Sección de Imagen -->
+        <!-- Sección de Imagen con Carrusel -->
         <div class="lg:col-span-2">
-          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-transparent dark:border-gray-700">
-            <img
-              v-if="house?.imageUrls?.length > 0"
-              :src="house.imageUrls[0]"
-              :alt="house.title"
-              class="w-full h-96 lg:h-[500px] object-cover"
-            />
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-transparent dark:border-gray-700 relative">
+            <!-- Carrusel de imágenes -->
+            <div v-if="house?.imageUrls && house.imageUrls.length > 0" class="relative" @mouseenter="stopCarousel" @mouseleave="startCarousel">
+              <!-- Imagen actual -->
+              <div class="relative w-full h-96 lg:h-[500px]">
+                <img
+                  :src="house.imageUrls[currentImageIndex].url"
+                  :alt="`${house.title} - Imagen ${currentImageIndex + 1}`"
+                  class="w-full h-full object-cover transition-opacity duration-300"
+                />
+              </div>
+
+              <!-- Botones de navegación -->
+              <button
+                v-if="house.imageUrls.length > 1"
+                @click="prevImage"
+                class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+              >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+              </button>
+              <button
+                v-if="house.imageUrls.length > 1"
+                @click="nextImage"
+                class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+              >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </button>
+
+              <!-- Indicadores de imagen -->
+              <div v-if="house.imageUrls.length > 1" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                <button
+                  v-for="(img, index) in house.imageUrls"
+                  :key="index"
+                  @click="goToImage(index)"
+                  :class="[
+                    'w-2 h-2 rounded-full transition-all',
+                    currentImageIndex === index
+                      ? 'bg-white w-8'
+                      : 'bg-white/50 hover:bg-white/75'
+                  ]"
+                ></button>
+              </div>
+
+              <!-- Contador de imágenes -->
+              <div class="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                {{ currentImageIndex + 1 }} / {{ house.imageUrls.length }}
+              </div>
+            </div>
+
+            <!-- Placeholder si no hay imágenes -->
             <div
               v-else
               class="w-full h-96 lg:h-[500px] bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
             >
-              <svg
-                class="w-16 h-16 text-gray-400 dark:text-gray-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                ></path>
-              </svg>
+              <div class="text-center">
+                <svg
+                  class="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  ></path>
+                </svg>
+                <p class="text-gray-500 dark:text-gray-400">Sin imágenes disponibles</p>
+              </div>
             </div>
           </div>
         </div>
@@ -167,7 +264,7 @@ const handleContact = () => {
                     </svg>
                     <strong class="mr-2">Habitaciones:</strong> {{ house?.bedroomsCount }}
                   </li>
-                  <li class="flex items-center text-gray-700">
+                  <li class="flex items-center text-gray-700 dark:text-gray-300">
                     <svg
                       class="w-5 h-5 text-blue-600 mr-3"
                       fill="none"
@@ -183,7 +280,7 @@ const handleContact = () => {
                     </svg>
                     <strong class="mr-2">Baños:</strong> {{ house?.bathroomsCount }}
                   </li>
-                  <li class="flex items-center text-gray-700">
+                  <li class="flex items-center text-gray-700 dark:text-gray-300">
                     <svg
                       class="w-5 h-5 text-blue-600 mr-3"
                       fill="none"
@@ -199,7 +296,7 @@ const handleContact = () => {
                     </svg>
                     <strong class="mr-2">Capacidad:</strong> {{ house?.capacityPeople }} personas
                   </li>
-                  <li class="flex items-center text-gray-700">
+                  <li class="flex items-center text-gray-700 dark:text-gray-300">
                     <svg
                       class="w-5 h-5 text-blue-600 mr-3"
                       fill="none"

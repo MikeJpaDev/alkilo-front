@@ -1,6 +1,7 @@
 import ShopLayoyts from '@/modules/shop/layouts/ShopLayoyts.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import { authRouters } from '../modules/auth/router/index.ts';
+import { adminRoutes } from '../modules/admin/router/index.ts';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,6 +40,7 @@ const router = createRouter({
       ],
     },
     authRouters,
+    adminRoutes,
   ],
 });
 
