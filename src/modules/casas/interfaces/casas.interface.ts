@@ -58,14 +58,10 @@ export interface Casa {
   munipalityId: Municipality; // Nota: hay un typo en "munipality" debería ser "municipality"
   provinceId: Province;
   reviews: Review[];
-<<<<<<< Updated upstream
   reviewsCount: number;
   averageRating: number;
   userHasReviewed?: boolean;
   imageUrls: string[];
-=======
-  imageUrls: ImageUrls[];
->>>>>>> Stashed changes
 }
 
 // Interfaz para Metadatos de paginación
