@@ -1,9 +1,11 @@
 <template>
   <nav class="fixed top-0 left-0 z-20 w-full border-b border-gray-200 bg-white py-2.5 px-6 sm:px-4">
     <div class="container mx-auto flex max-w-6xl flex-wrap items-center justify-between">
-      <a href="#" class="flex items-center">
-        <span class="self-center whitespace-nowrap text-xl font-semibold">Alkilo</span>
-      </a>
+      <RouterLink to="/">
+        <a href="#" class="flex items-center">
+          <span class="self-center whitespace-nowrap text-xl font-semibold">Alkilo</span>
+        </a>
+      </RouterLink>
       <div class="mt-2 sm:mt-0 sm:flex md:order-2">
         <!-- Login Button -->
         <RouterLink to="/auth/login">

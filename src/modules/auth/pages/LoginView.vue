@@ -54,11 +54,13 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import { useAuthStore } from '../store/auth.store';
+import { useToast } from 'vue-toastification';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const aurhStorage = useAuthStore();
-const router = useRouter();
+const toast = useToast();
 const myForm = reactive({
   email: '',
   password: '',
@@ -71,6 +73,15 @@ const passwordlInputRed = ref<HTMLInputElement | null>(null);
 const onLogin = async () => {
   console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', emailInputRed);
   const ok = await aurhStorage.login(myForm.email, myForm.password);
-  console.log(ok);
+  if (ok) {
+    toast.success('Login exitoso', {
+      timeout: 2000,
+    });
+    router.push({ name: 'home' });
+    return;
+  }
+  toast.error('Credenciales incorrectas', {
+    timeout: 2000,
+  });
 };
 </script>
