@@ -3,9 +3,10 @@
   <div
     class="flex flex-wrap items-center overflow-x-auto overflow-y-hidden py-10 justify-center bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors"
   >
-    <a
+    <!-- Change to the correct route name if needed -->
+    <RouterLink
+      to="testing"
       rel="noopener noreferrer"
-      href="#"
       class="flex items-center flex-shrink-0 px-5 py-3 space-x-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
     >
       <svg
@@ -20,8 +21,8 @@
       >
         <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
       </svg>
-      <span>Architecto</span>
-    </a>
+      <span>Crear Casa</span>
+    </RouterLink>
     <a
       rel="noopener noreferrer"
       href="#"

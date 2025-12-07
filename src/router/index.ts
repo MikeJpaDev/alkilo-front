@@ -32,6 +32,11 @@ const router = createRouter({
           component: () => import('@/modules/shop/views/ContactView.vue'),
         },
         {
+          path: '/testing',
+          name: 'createCasa',
+          component: () => import('@/modules/shop/views/CreateCasa.vue'),
+        },
+        {
           path: '/casas/:id',
           name: 'casaDetails',
           component: () => import('@/modules/casas/view/CasaDetails.vue'),

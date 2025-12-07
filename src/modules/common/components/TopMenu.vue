@@ -233,7 +233,6 @@
 import { onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useTheme } from '@/composables/useTheme';
-import { AuthStatus } from '@/modules/auth/interfaces/auth-status.enum';
 import { useAuthStore } from '@/modules/auth/store/auth.store';
 
 console.log('aquiiiiiiiiiiiiii', ref(localStorage.getItem('user')));
