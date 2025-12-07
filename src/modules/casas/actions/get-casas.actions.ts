@@ -1,15 +1,15 @@
 import { AlkiloApi } from '@/api/AlkiloApi';
 import type { Casa, CasasResponse } from '../interfaces/casas.interface';
 
-export const getCasasActions = async (page: number = 1, limit: number = 12) => {
+export const getCasasActions = async (page: number = 1, limit: number = 10) => {
   try {
     const { data } = await AlkiloApi.get<CasasResponse>(
-      `/Casas?page=${page}&limit=${limit * page}`,
+      `/casas?page=${page}&limit=${limit}`,
     );
-    console.log(data.data);
+    console.log('Casas response:', data);
     return data;
   } catch (error) {
-    console.log(error);
+    console.error('Error fetching casas:', error);
     throw new Error('Error fetching casas');
   }
 };

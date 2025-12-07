@@ -1,17 +1,17 @@
 <template>
   <!-- Title -->
-  <div class="pt-32 bg-white">
-    <h1 class="text-center text-2xl font-bold text-gray-800">Casas en Alkilo</h1>
+  <div class="pt-32 bg-white dark:bg-gray-900 transition-colors">
+    <h1 class="text-center text-2xl font-bold text-gray-800 dark:text-gray-100">Casas en Alkilo</h1>
   </div>
 
   <!-- Tab Menu -->
   <div
-    class="flex flex-wrap items-center overflow-x-auto overflow-y-hidden py-10 justify-center bg-white text-gray-800"
+    class="flex flex-wrap items-center overflow-x-auto overflow-y-hidden py-10 justify-center bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors"
   >
     <a
       rel="noopener noreferrer"
       href="#"
-      class="flex items-center flex-shrink-0 px-5 py-3 space-x-2text-gray-600"
+      class="flex items-center flex-shrink-0 px-5 py-3 space-x-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -30,7 +30,7 @@
     <a
       rel="noopener noreferrer"
       href="#"
-      class="flex items-center flex-shrink-0 px-5 py-3 space-x-2 rounded-t-lg text-gray-900"
+      class="flex items-center flex-shrink-0 px-5 py-3 space-x-2 rounded-t-lg text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -99,12 +99,12 @@
   <!-- component -->
   <div
     v-if="!casas"
-    class="flex items-center justify-center min-h-screen p-5 bg-gray-100 min-w-screen"
+    class="flex items-center justify-center min-h-screen p-5 bg-gray-100 dark:bg-gray-900 min-w-screen"
   >
     <div class="flex space-x-2 animate-pulse">
-      <div class="w-3 h-3 bg-gray-500 rounded-full"></div>
-      <div class="w-3 h-3 bg-gray-500 rounded-full"></div>
-      <div class="w-3 h-3 bg-gray-500 rounded-full"></div>
+      <div class="w-3 h-3 bg-gray-500 dark:bg-gray-400 rounded-full"></div>
+      <div class="w-3 h-3 bg-gray-500 dark:bg-gray-400 rounded-full"></div>
+      <div class="w-3 h-3 bg-gray-500 dark:bg-gray-400 rounded-full"></div>
     </div>
   </div>
 
@@ -115,6 +115,9 @@
     :page="casas.meta.page"
     :has-next="casas.meta.hasNext"
     :has-prev="casas.meta.hasPrevious"
+    :total="casas.meta.total"
+    :total-pages="casas.meta.totalPages"
+    :limit="casas.meta.limit"
   />
 </template>
 
@@ -125,16 +128,26 @@ import { getCasasActions } from '../../casas/actions';
 import CasasList from '@/modules/casas/components/CasaList.vue';
 import BottonsPagination from '@/modules/common/components/BottonsPagination.vue';
 import { useRoute } from 'vue-router';
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 
 const route = useRoute();
 const page = ref(Number(route.query.page) || 1);
 
+// Observar cambios en la query de la ruta
+watch(
+  () => route.query.page,
+  (newPage) => {
+    page.value = Number(newPage) || 1;
+  },
+  { immediate: true },
+);
+
 const { data: casas, isLoading } = useQuery({
-  queryKey: ['casas', { page: page.value }],
+  queryKey: ['casas', page],
   queryFn: () => getCasasActions(page.value),
   staleTime: 1000 * 60 * 5, //5 minutos de refresco
 });
+
 // Datos de ejemplo
 const provinciasList = ref([
   { id: 1, name: 'La Habana' },
@@ -165,13 +178,4 @@ const filters = ref({
   maxPrice: '',
   bedrooms: '',
 });
-
-watch(
-  () => route.query.page?.valueOf,
-  (newPage) => {
-    page.value = Number(newPage) || 1;
-    console.log('Page changed to:', page.value);
-  },
-  { immediate: true },
-);
 </script>

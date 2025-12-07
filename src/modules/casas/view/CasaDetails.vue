@@ -55,12 +55,12 @@ const handleContact = () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 py-8">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 transition-colors">
     <div class="container mx-auto px-4 max-w-7xl">
       <!-- Botón Volver -->
       <button
         @click="router.back()"
-        class="flex items-center text-gray-600 hover:text-gray-900 mb-6 transition-colors"
+        class="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-6 transition-colors"
       >
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -76,21 +76,21 @@ const handleContact = () => {
       <!-- Estado de carga -->
       <div v-if="isLoading" class="flex justify-center items-center min-h-[400px]">
         <div class="text-center">
-          <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
-          <p class="mt-4 text-gray-600">Cargando detalles de la casa...</p>
+          <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
+          <p class="mt-4 text-gray-600 dark:text-gray-400">Cargando detalles de la casa...</p>
         </div>
       </div>
 
       <!-- Estado de error -->
-      <div v-else-if="isError" class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-        <svg class="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div v-else-if="isError" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
+        <svg class="w-16 h-16 text-red-500 dark:text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
-        <h3 class="text-xl font-semibold text-red-800 mb-2">Error al cargar la casa</h3>
-        <p class="text-red-600 mb-4">No se pudieron obtener los detalles de esta propiedad.</p>
+        <h3 class="text-xl font-semibold text-red-800 dark:text-red-300 mb-2">Error al cargar la casa</h3>
+        <p class="text-red-600 dark:text-red-400 mb-4">No se pudieron obtener los detalles de esta propiedad.</p>
         <button
           @click="router.push({ name: 'home' })"
-          class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors"
+          class="bg-red-600 dark:bg-red-500 hover:bg-red-700 dark:hover:bg-red-600 text-white px-6 py-2 rounded-lg transition-colors"
         >
           Volver al inicio
         </button>
@@ -100,7 +100,7 @@ const handleContact = () => {
       <div v-else-if="house" class="grid lg:grid-cols-3 gap-8">
         <!-- Sección de Imagen -->
         <div class="lg:col-span-2">
-          <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-transparent dark:border-gray-700">
             <img
               v-if="house?.imageUrls?.length > 0"
               :src="house.imageUrls[0]"
@@ -109,10 +109,10 @@ const handleContact = () => {
             />
             <div
               v-else
-              class="w-full h-96 lg:h-[500px] bg-gray-200 flex items-center justify-center"
+              class="w-full h-96 lg:h-[500px] bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
             >
               <svg
-                class="w-16 h-16 text-gray-400"
+                class="w-16 h-16 text-gray-400 dark:text-gray-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -131,7 +131,7 @@ const handleContact = () => {
         <!-- Card sticky con info -->
         <div class="lg:col-span-1">
           <div class="sticky top-8">
-            <div class="bg-white rounded-2xl shadow-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-transparent dark:border-gray-700">
               <!-- Badge de rating -->
               <div class="mb-4">
                 <span
@@ -144,14 +144,14 @@ const handleContact = () => {
               </div>
 
               <!-- Precio -->
-              <h3 class="text-3xl font-bold text-blue-600 mb-1">{{ house?.pricePerNight }}€</h3>
-              <p class="text-gray-500 mb-6">por noche</p>
+              <h3 class="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">{{ house?.pricePerNight }}€</h3>
+              <p class="text-gray-500 dark:text-gray-400 mb-6">por noche</p>
 
               <!-- Características -->
               <div class="mb-6">
-                <h5 class="font-bold text-gray-900 mb-3">Características</h5>
+                <h5 class="font-bold text-gray-900 dark:text-gray-100 mb-3">Características</h5>
                 <ul class="space-y-3">
-                  <li class="flex items-center text-gray-700">
+                  <li class="flex items-center text-gray-700 dark:text-gray-300">
                     <svg
                       class="w-5 h-5 text-blue-600 mr-3"
                       fill="none"
@@ -221,12 +221,12 @@ const handleContact = () => {
 
               <!-- Propietario -->
               <div class="mb-6">
-                <h5 class="font-bold text-gray-900 mb-3">Anfitrión</h5>
-                <p class="font-semibold text-gray-800">
+                <h5 class="font-bold text-gray-900 dark:text-gray-100 mb-3">Anfitrión</h5>
+                <p class="font-semibold text-gray-800 dark:text-gray-200">
                   {{ house?.createdBy.firstName }} {{ house?.createdBy.lastName }}
                 </p>
-                <p class="text-sm text-gray-600">{{ house?.createdBy.email }}</p>
-                <p class="text-sm text-gray-600" v-if="house?.contacts.length">
+                <p class="text-sm text-gray-600 dark:text-gray-400">{{ house?.createdBy.email }}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400" v-if="house?.contacts.length">
                   <svg
                     class="w-4 h-4 inline mr-1"
                     fill="none"
@@ -247,7 +247,7 @@ const handleContact = () => {
               <!-- Botón de contacto -->
               <button
                 @click="handleContact"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center"
+                class="w-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center"
               >
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -266,17 +266,17 @@ const handleContact = () => {
 
       <!-- Descripción -->
       <div class="mt-8">
-        <div class="bg-white rounded-2xl shadow-lg p-6">
-          <h4 class="text-xl font-bold text-gray-900 mb-3">Descripción</h4>
-          <p class="text-gray-700 leading-relaxed">{{ house?.description }}</p>
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-transparent dark:border-gray-700">
+          <h4 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">Descripción</h4>
+          <p class="text-gray-700 dark:text-gray-300 leading-relaxed">{{ house?.description }}</p>
         </div>
       </div>
 
       <!-- Ubicación -->
       <div class="mt-8">
-        <div class="bg-white rounded-2xl shadow-lg p-6">
-          <h4 class="text-xl font-bold text-gray-900 mb-3">Ubicación</h4>
-          <p class="text-gray-700 flex items-start">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-transparent dark:border-gray-700">
+          <h4 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">Ubicación</h4>
+          <p class="text-gray-700 dark:text-gray-300 flex items-start">
             <svg
               class="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0"
               fill="none"
@@ -307,12 +307,12 @@ const handleContact = () => {
 
       <!-- Sección de Comentarios/Reseñas -->
       <div class="mt-8">
-        <div class="bg-white rounded-2xl shadow-lg p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-transparent dark:border-gray-700">
           <!-- Header de reseñas -->
           <div class="flex items-center justify-between mb-6">
-            <h4 class="text-xl font-bold text-gray-900">Reseñas ({{ house?.reviewsCount }})</h4>
+            <h4 class="text-xl font-bold text-gray-900 dark:text-gray-100">Reseñas ({{ house?.reviewsCount }})</h4>
             <div class="flex items-center">
-              <span class="text-2xl font-bold text-blue-600 mr-2">{{
+              <span class="text-2xl font-bold text-blue-600 dark:text-blue-400 mr-2">{{
                 house?.averageRating
               }}</span>
               <span class="text-yellow-500 text-xl">{{ getStars(house?.averageRating || 0) }}</span>
@@ -324,44 +324,44 @@ const handleContact = () => {
             <div
               v-for="review in house?.reviews"
               :key="review.id"
-              class="border-b border-gray-200 pb-6 last:border-0"
+              class="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-0"
             >
               <div class="flex items-start space-x-4">
                 <!-- Avatar placeholder -->
                 <div
-                  class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0"
+                  class="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0"
                 >
-                  <span class="text-gray-600 font-semibold">
+                  <span class="text-gray-600 dark:text-gray-200 font-semibold">
                     {{ review.user.firstName[0] }}{{ review.user.lastName[0] }}
                   </span>
                 </div>
 
                 <div class="flex-1">
                   <div class="flex items-center justify-between mb-1">
-                    <p class="font-semibold text-gray-900">
+                    <p class="font-semibold text-gray-900 dark:text-gray-100">
                       {{ review.user.firstName }} {{ review.user.lastName }}
                     </p>
-                    <p class="text-sm text-gray-500">{{ formatDate(review.createdAt) }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ formatDate(review.createdAt) }}</p>
                   </div>
 
                   <div class="text-yellow-500 text-sm mb-2">
                     {{ getStars(review.rating) }}
                   </div>
 
-                  <p class="text-gray-700">{{ review.comment }}</p>
+                  <p class="text-gray-700 dark:text-gray-300">{{ review.comment }}</p>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Formulario para nueva reseña (si no ha reseñado) -->
-          <div v-if="!house?.userHasReviewed" class="mt-8 pt-6 border-t border-gray-200">
-            <h5 class="font-bold text-gray-900 mb-4">Deja tu reseña</h5>
+          <div v-if="!house?.userHasReviewed" class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <h5 class="font-bold text-gray-900 dark:text-gray-100 mb-4">Deja tu reseña</h5>
             <form @submit.prevent class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Calificación</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Calificación</label>
                 <select
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 >
                   <option value="5">5 estrellas</option>
                   <option value="4">4 estrellas</option>
@@ -371,16 +371,16 @@ const handleContact = () => {
                 </select>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Comentario</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Comentario</label>
                 <textarea
                   rows="4"
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                   placeholder="Comparte tu experiencia..."
                 ></textarea>
               </div>
               <button
                 type="submit"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200"
+                class="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200"
               >
                 Enviar reseña
               </button>
