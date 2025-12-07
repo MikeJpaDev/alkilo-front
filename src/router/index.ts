@@ -41,6 +41,11 @@ const router = createRouter({
     },
     authRouters,
     adminRoutes,
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: () => import('@/modules/common/views/Page-404.vue'),
+    },
   ],
 });
 
