@@ -34,6 +34,11 @@ export interface Review {
   rating: number;
   comment: string;
   createdAt: string;
+  user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
 }
 
 // Interfaz principal para Casa
@@ -46,12 +51,16 @@ export interface Casa {
   bedroomsCount: number;
   bathroomsCount: number;
   capacityPeople: number;
+  metrosCuadrados?: number;
   address: string;
   createDate: string;
   contacts: Contact[];
   munipalityId: Municipality; // Nota: hay un typo en "munipality" debería ser "municipality"
   provinceId: Province;
   reviews: Review[];
+  reviewsCount: number;
+  averageRating: number;
+  userHasReviewed?: boolean;
   imageUrls: string[];
 }
 
