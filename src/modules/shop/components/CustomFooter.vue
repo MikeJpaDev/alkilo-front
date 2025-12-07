@@ -1,7 +1,7 @@
 <template>
-  <footer class="py-6 bg-gray-200 text-gray-900">
+  <footer class="py-6 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100 transition-colors">
     <div
-      class="container px-6 mx-auto space-y-6 divide-y divide-gray-400 md:space-y-12 divide-opacity-50"
+      class="container px-6 mx-auto space-y-6 divide-y divide-gray-400 dark:divide-gray-600 md:space-y-12 divide-opacity-50"
     >
       <div class="grid justify-center lg:justify-between">
         <div

@@ -1,12 +1,12 @@
 <template>
   <article
-    class="rounded-xl bg-white p-3 shadow-lg hover:shadow-xl hover:transform hover:scale-105 duration-300"
+    class="rounded-xl bg-white dark:bg-gray-800 p-3 shadow-lg hover:shadow-xl hover:transform hover:scale-105 duration-300 border border-transparent dark:border-gray-700 transition-colors"
   >
     <a :href="`/casas/${casa.id}`">
       <div class="relative flex items-end overflow-hidden rounded-xl">
         <img :src="casa.imageUrls[0]?.url" :alt="casa.title" class="h-48 w-full object-cover" />
         <div
-          class="absolute bottom-3 left-3 inline-flex items-center rounded-lg bg-white p-2 shadow-md"
+          class="absolute bottom-3 left-3 inline-flex items-center rounded-lg bg-white dark:bg-gray-700 p-2 shadow-md"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -23,16 +23,16 @@
       </div>
 
       <div class="mt-1 p-2">
-        <h2 class="text-slate-700">{{ casa.title }}</h2>
-        <p class="mt-1 text-sm text-slate-400">
+        <h2 class="text-slate-700 dark:text-gray-200 font-semibold">{{ casa.title }}</h2>
+        <p class="mt-1 text-sm text-slate-400 dark:text-gray-400">
           {{ casa.provinceId.name }}, {{ casa.munipalityId.name }}
         </p>
 
         <div class="mt-3 flex items-end justify-between">
-          <p class="text-lg font-bold text-blue-500">${{ casa.pricePerNight }}</p>
+          <p class="text-lg font-bold text-blue-600 dark:text-blue-400">${{ casa.pricePerNight }}</p>
 
           <div
-            class="flex items-center space-x-1.5 rounded-lg bg-blue-500 px-4 py-1.5 text-white duration-100 hover:bg-blue-600"
+            class="flex items-center space-x-1.5 rounded-lg bg-blue-600 dark:bg-blue-500 px-4 py-1.5 text-white duration-100 hover:bg-blue-700 dark:hover:bg-blue-600"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
