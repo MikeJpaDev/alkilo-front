@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { getCasaActions } from '../actions/get-casa.actions';
 import type { Casa } from '../interfaces/casas.interface';
+import ContactNumbers from '@/modules/casas/components/ContactNumbers.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -24,13 +25,14 @@ const {
   staleTime: 1000 * 60 * 5, // 5 minutos de refresco
 });
 
-console.log('House data:', house);
+console.log('House data:', house.value?.contacts);
 
 // Computed para el badge de rating
 const ratingBadgeClass = computed(() => {
   const rating = house.value?.averageRating || 0;
   if (rating >= 4.5) return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-  if (rating >= 3.5) return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+  if (rating >= 3.5)
+    return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
   return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
 });
 
@@ -66,9 +68,10 @@ const nextImage = () => {
 
 const prevImage = () => {
   if (house.value?.imageUrls && house.value.imageUrls.length > 0) {
-    currentImageIndex.value = currentImageIndex.value === 0
-      ? house.value.imageUrls.length - 1
-      : currentImageIndex.value - 1;
+    currentImageIndex.value =
+      currentImageIndex.value === 0
+        ? house.value.imageUrls.length - 1
+        : currentImageIndex.value - 1;
   }
 };
 
@@ -99,6 +102,8 @@ onMounted(() => {
 onUnmounted(() => {
   stopCarousel();
 });
+
+console.log(house.value);
 </script>
 
 <template>
@@ -123,18 +128,37 @@ onUnmounted(() => {
       <!-- Estado de carga -->
       <div v-if="isLoading" class="flex justify-center items-center min-h-[400px]">
         <div class="text-center">
-          <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
+          <div
+            class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"
+          ></div>
           <p class="mt-4 text-gray-600 dark:text-gray-400">Cargando detalles de la casa...</p>
         </div>
       </div>
 
       <!-- Estado de error -->
-      <div v-else-if="isError" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
-        <svg class="w-16 h-16 text-red-500 dark:text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      <div
+        v-else-if="isError"
+        class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center"
+      >
+        <svg
+          class="w-16 h-16 text-red-500 dark:text-red-400 mx-auto mb-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          ></path>
         </svg>
-        <h3 class="text-xl font-semibold text-red-800 dark:text-red-300 mb-2">Error al cargar la casa</h3>
-        <p class="text-red-600 dark:text-red-400 mb-4">No se pudieron obtener los detalles de esta propiedad.</p>
+        <h3 class="text-xl font-semibold text-red-800 dark:text-red-300 mb-2">
+          Error al cargar la casa
+        </h3>
+        <p class="text-red-600 dark:text-red-400 mb-4">
+          No se pudieron obtener los detalles de esta propiedad.
+        </p>
         <button
           @click="router.push({ name: 'home' })"
           class="bg-red-600 dark:bg-red-500 hover:bg-red-700 dark:hover:bg-red-600 text-white px-6 py-2 rounded-lg transition-colors"
@@ -147,9 +171,16 @@ onUnmounted(() => {
       <div v-else-if="house" class="grid lg:grid-cols-3 gap-8">
         <!-- Sección de Imagen con Carrusel -->
         <div class="lg:col-span-2">
-          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-transparent dark:border-gray-700 relative">
+          <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-transparent dark:border-gray-700 relative"
+          >
             <!-- Carrusel de imágenes -->
-            <div v-if="house?.imageUrls && house.imageUrls.length > 0" class="relative" @mouseenter="stopCarousel" @mouseleave="startCarousel">
+            <div
+              v-if="house?.imageUrls && house.imageUrls.length > 0"
+              class="relative"
+              @mouseenter="stopCarousel"
+              @mouseleave="startCarousel"
+            >
               <!-- Imagen actual -->
               <div class="relative w-full h-96 lg:h-[500px]">
                 <img
@@ -166,7 +197,12 @@ onUnmounted(() => {
                 class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
               >
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 19l-7-7 7-7"
+                  ></path>
                 </svg>
               </button>
               <button
@@ -175,27 +211,35 @@ onUnmounted(() => {
                 class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
               >
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  ></path>
                 </svg>
               </button>
 
               <!-- Indicadores de imagen -->
-              <div v-if="house.imageUrls.length > 1" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+              <div
+                v-if="house.imageUrls.length > 1"
+                class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2"
+              >
                 <button
                   v-for="(img, index) in house.imageUrls"
                   :key="index"
                   @click="goToImage(index)"
                   :class="[
                     'w-2 h-2 rounded-full transition-all',
-                    currentImageIndex === index
-                      ? 'bg-white w-8'
-                      : 'bg-white/50 hover:bg-white/75'
+                    currentImageIndex === index ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75',
                   ]"
                 ></button>
               </div>
 
               <!-- Contador de imágenes -->
-              <div class="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+              <div
+                class="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm"
+              >
                 {{ currentImageIndex + 1 }} / {{ house.imageUrls.length }}
               </div>
             </div>
@@ -228,7 +272,9 @@ onUnmounted(() => {
         <!-- Card sticky con info -->
         <div class="lg:col-span-1">
           <div class="sticky top-8">
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-transparent dark:border-gray-700">
+            <div
+              class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-transparent dark:border-gray-700"
+            >
               <!-- Badge de rating -->
               <div class="mb-4">
                 <span
@@ -241,7 +287,9 @@ onUnmounted(() => {
               </div>
 
               <!-- Precio -->
-              <h3 class="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">{{ house?.pricePerNight }}€</h3>
+              <h3 class="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">
+                {{ house?.pricePerNight }}€
+              </h3>
               <p class="text-gray-500 dark:text-gray-400 mb-6">por noche</p>
 
               <!-- Características -->
@@ -296,23 +344,6 @@ onUnmounted(() => {
                     </svg>
                     <strong class="mr-2">Capacidad:</strong> {{ house?.capacityPeople }} personas
                   </li>
-                  <li class="flex items-center text-gray-700 dark:text-gray-300">
-                    <svg
-                      class="w-5 h-5 text-blue-600 mr-3"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.94 4.5 4.5 0 00-7.78-2.97A4.5 4.5 0 007.5 9.5 4.5 4.5 0 003 15z"
-                      ></path>
-                    </svg>
-                    <strong class="mr-2">Área:</strong>
-                    {{ house?.metrosCuadrados || 'No especificado' }} m²
-                  </li>
                 </ul>
               </div>
 
@@ -323,22 +354,14 @@ onUnmounted(() => {
                   {{ house?.createdBy.firstName }} {{ house?.createdBy.lastName }}
                 </p>
                 <p class="text-sm text-gray-600 dark:text-gray-400">{{ house?.createdBy.email }}</p>
-                <p class="text-sm text-gray-600 dark:text-gray-400" v-if="house?.contacts.length">
-                  <svg
-                    class="w-4 h-4 inline mr-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                    ></path>
-                  </svg>
-                  {{ house?.contacts[0].number }}
-                </p>
+                <template v-if="house?.contacts.length">
+                  <h5 class="font-bold text-gray-900 dark:text-gray-100 mb-3">Contactos:</h5>
+                  <ContactNumbers
+                    v-for="contact in house.contacts"
+                    :key="contact.id"
+                    :contact="contact"
+                  ></ContactNumbers>
+                </template>
               </div>
 
               <!-- Botón de contacto -->
@@ -363,7 +386,9 @@ onUnmounted(() => {
 
       <!-- Descripción -->
       <div class="mt-8">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-transparent dark:border-gray-700">
+        <div
+          class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-transparent dark:border-gray-700"
+        >
           <h4 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">Descripción</h4>
           <p class="text-gray-700 dark:text-gray-300 leading-relaxed">{{ house?.description }}</p>
         </div>
@@ -371,7 +396,9 @@ onUnmounted(() => {
 
       <!-- Ubicación -->
       <div class="mt-8">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-transparent dark:border-gray-700">
+        <div
+          class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-transparent dark:border-gray-700"
+        >
           <h4 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">Ubicación</h4>
           <p class="text-gray-700 dark:text-gray-300 flex items-start">
             <svg
@@ -404,10 +431,14 @@ onUnmounted(() => {
 
       <!-- Sección de Comentarios/Reseñas -->
       <div class="mt-8">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-transparent dark:border-gray-700">
+        <div
+          class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-transparent dark:border-gray-700"
+        >
           <!-- Header de reseñas -->
           <div class="flex items-center justify-between mb-6">
-            <h4 class="text-xl font-bold text-gray-900 dark:text-gray-100">Reseñas ({{ house?.reviewsCount }})</h4>
+            <h4 class="text-xl font-bold text-gray-900 dark:text-gray-100">
+              Reseñas ({{ house?.reviewsCount }})
+            </h4>
             <div class="flex items-center">
               <span class="text-2xl font-bold text-blue-600 dark:text-blue-400 mr-2">{{
                 house?.averageRating
@@ -438,7 +469,9 @@ onUnmounted(() => {
                     <p class="font-semibold text-gray-900 dark:text-gray-100">
                       {{ review.user.firstName }} {{ review.user.lastName }}
                     </p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ formatDate(review.createdAt) }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      {{ formatDate(review.createdAt) }}
+                    </p>
                   </div>
 
                   <div class="text-yellow-500 text-sm mb-2">
@@ -452,11 +485,16 @@ onUnmounted(() => {
           </div>
 
           <!-- Formulario para nueva reseña (si no ha reseñado) -->
-          <div v-if="!house?.userHasReviewed" class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <div
+            v-if="!house?.userHasReviewed"
+            class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700"
+          >
             <h5 class="font-bold text-gray-900 dark:text-gray-100 mb-4">Deja tu reseña</h5>
             <form @submit.prevent class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Calificación</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >Calificación</label
+                >
                 <select
                   class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 >
@@ -468,7 +506,9 @@ onUnmounted(() => {
                 </select>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Comentario</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >Comentario</label
+                >
                 <textarea
                   rows="4"
                   class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"

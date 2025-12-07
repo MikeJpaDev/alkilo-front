@@ -128,7 +128,7 @@ import { getCasasActions } from '../../casas/actions';
 import CasasList from '@/modules/casas/components/CasaList.vue';
 import BottonsPagination from '@/modules/common/components/BottonsPagination.vue';
 import { useRoute } from 'vue-router';
-import { ref, watch, computed } from 'vue';
+import { ref, watch } from 'vue';
 
 const route = useRoute();
 const page = ref(Number(route.query.page) || 1);
@@ -142,7 +142,7 @@ watch(
   { immediate: true },
 );
 
-const { data: casas, isLoading } = useQuery({
+const { data: casas } = useQuery({
   queryKey: ['casas', page],
   queryFn: () => getCasasActions(page.value),
   staleTime: 1000 * 60 * 5, //5 minutos de refresco

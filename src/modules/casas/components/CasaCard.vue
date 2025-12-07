@@ -1,10 +1,10 @@
 <template>
   <article
-    class="rounded-xl bg-white dark:bg-gray-800 p-3 shadow-lg hover:shadow-xl hover:transform hover:scale-105 duration-300 border border-transparent dark:border-gray-700 transition-colors"
+    class="w-full max-w-sm md:w-80 mx-auto rounded-xl bg-white dark:bg-gray-800 p-3 shadow-lg hover:shadow-xl hover:transform hover:scale-103 duration-300 border border-transparent dark:border-gray-700 transition-colors"
   >
-    <a :href="`/casas/${casa.id}`">
-      <div class="relative flex items-end overflow-hidden rounded-xl">
-        <img :src="casa.imageUrls[0]?.url" :alt="casa.title" class="h-48 w-full object-cover" />
+    <a :href="`/casas/${casa.id}`" class="block">
+      <div class="relative flex items-end overflow-hidden rounded-lg">
+        <img :src="casa.imageUrls[0]?.url" :alt="casa.title" class="h-56 w-full object-cover" />
         <div
           class="absolute bottom-3 left-3 inline-flex items-center rounded-lg bg-white dark:bg-gray-700 p-2 shadow-md"
         >
@@ -22,17 +22,21 @@
         </div>
       </div>
 
-      <div class="mt-1 p-2">
-        <h2 class="text-slate-700 dark:text-gray-200 font-semibold">{{ casa.title }}</h2>
-        <p class="mt-1 text-sm text-slate-400 dark:text-gray-400">
+      <div class="mt-3 p-2">
+        <h2 class="text-slate-700 dark:text-gray-200 font-semibold text-base md:text-lg">
+          {{ casa.title }}
+        </h2>
+        <p class="mt-1 text-xs md:text-sm text-slate-400 dark:text-gray-400">
           {{ casa.provinceId.name }}, {{ casa.munipalityId.name }}
         </p>
 
-        <div class="mt-3 flex items-end justify-between">
-          <p class="text-lg font-bold text-blue-600 dark:text-blue-400">${{ casa.pricePerNight }}</p>
+        <div class="mt-4 flex items-end justify-between">
+          <p class="text-lg md:text-xl font-bold text-blue-600 dark:text-blue-400">
+            ${{ casa.pricePerNight }}
+          </p>
 
           <div
-            class="flex items-center space-x-1.5 rounded-lg bg-blue-600 dark:bg-blue-500 px-4 py-1.5 text-white duration-100 hover:bg-blue-700 dark:hover:bg-blue-600"
+            class="flex items-center space-x-1 rounded-lg bg-blue-600 dark:bg-blue-500 px-4 py-2 text-white duration-100 hover:bg-blue-700 dark:hover:bg-blue-600"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

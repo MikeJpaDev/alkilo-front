@@ -1,5 +1,6 @@
 # Logs
 logs
+*.env
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -25,7 +26,7 @@ coverage
 *.sw?
 
 *.tsbuildinfo
-
+*.env
 .eslintcache
 
 # Cypress
