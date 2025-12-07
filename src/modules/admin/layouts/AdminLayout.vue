@@ -105,12 +105,26 @@
         <!-- User Profile -->
         <div class="p-4 border-t border-gray-200 dark:border-gray-700">
           <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
-              AD
+            <img
+              v-if="authStore.user?.profilePictureUrl && !imageError"
+              :src="authStore.user.profilePictureUrl"
+              :alt="authStore.user.firstName"
+              @error="imageError = true"
+              class="w-10 h-10 rounded-full object-cover"
+            />
+            <div
+              v-else
+              class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm"
+            >
+              {{ authStore.user?.firstName?.charAt(0) || 'A' }}{{ authStore.user?.lastName?.charAt(0) || 'D' }}
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-gray-900 dark:text-white truncate">Admin User</p>
-              <p class="text-xs text-gray-500 dark:text-gray-400 truncate">admin@alkilo.com</p>
+              <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                {{ authStore.user?.firstName || 'Admin' }} {{ authStore.user?.lastName || 'User' }}
+              </p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                {{ authStore.user?.roles?.includes('admin') ? 'Administrador' : 'Usuario' }}
+              </p>
             </div>
           </div>
         </div>
@@ -190,12 +204,17 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useTheme } from '@/composables/useTheme';
+import { useAuthStore } from '@/modules/auth/store/auth.store';
 
 const route = useRoute();
 const { isDark, toggleTheme, initTheme } = useTheme();
+const authStore = useAuthStore();
 const sidebarOpen = ref(false);
+const imageError = ref(false);
 
-onMounted(() => {
+onMounted(async () => {
   initTheme();
+  // Cargar información actualizada del usuario
+  await authStore.fetchUserMe();
 });
 </script>

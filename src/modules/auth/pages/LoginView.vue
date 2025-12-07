@@ -144,7 +144,13 @@ const onLogin = async () => {
     toast.success('Login exitoso', {
       timeout: 2000,
     });
-    router.push({ name: 'home' });
+    // Redirigir a /admin si el usuario es admin
+    const user = aurhStorage.user;
+    if (user && user.roles && user.roles.includes('admin')) {
+      router.push('/admin');
+    } else {
+      router.push({ name: 'home' });
+    }
     return;
   }
   toast.error('Credenciales incorrectas', {

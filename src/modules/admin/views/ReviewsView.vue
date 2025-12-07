@@ -130,6 +130,7 @@ import { useToast } from 'vue-toastification';
 const toast = useToast();
 const queryClient = useQueryClient();
 const currentPage = ref(1);
+const activeRating = ref<number | undefined>(undefined);
 const filters = ref({
   search: '',
   rating: ''
@@ -139,8 +140,8 @@ const isViewModalOpen = ref(false);
 const selectedReview = ref<Review | null>(null);
 
 const { data: reviews, isLoading } = useQuery({
-  queryKey: ['adminReviewsList', currentPage],
-  queryFn: () => getAllReviews(currentPage.value, 10),
+  queryKey: ['adminReviewsList', currentPage, activeRating],
+  queryFn: () => getAllReviews(currentPage.value, 10, undefined, activeRating.value),
 });
 
 const deleteMutation = useMutation({
@@ -171,6 +172,7 @@ const handleDelete = async (id: number) => {
 };
 
 const applyFilters = () => {
-  console.log('Aplicando filtros:', filters.value);
+  currentPage.value = 1;
+  activeRating.value = filters.value.rating ? Number(filters.value.rating) : undefined;
 };
 </script>

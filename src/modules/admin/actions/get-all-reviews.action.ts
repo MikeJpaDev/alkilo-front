@@ -16,7 +16,8 @@ interface ReviewsResponse {
 export const getAllReviews = async (
   page = 1,
   limit = 10,
-  userId?: string
+  userId?: string,
+  rating?: number
 ): Promise<ReviewsResponse> => {
   const params: Record<string, any> = { page, limit };
 
@@ -24,7 +25,11 @@ export const getAllReviews = async (
     params.userId = userId;
   }
 
-  const { data } = await AlkiloApi.get<ReviewsResponse>('/reviews', {
+  if (rating) {
+    params.rating = rating;
+  }
+
+  const { data } = await AlkiloApi.get<ReviewsResponse>('/review', {
     params
   });
   return data;

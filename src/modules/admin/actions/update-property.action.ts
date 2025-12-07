@@ -1,6 +1,11 @@
 import { AlkiloApi } from '@/api/AlkiloApi';
 import type { Casa } from '@/modules/casas/interfaces/casas.interface';
 
+export interface Contact {
+  name: string;
+  number: string;
+}
+
 export interface UpdatePropertyData {
   title?: string;
   description?: string;
@@ -8,10 +13,9 @@ export interface UpdatePropertyData {
   bedroomsCount?: number;
   bathroomsCount?: number;
   capacityPeople?: number;
-  metrosCuadrados?: number;
   address?: string;
+  contacts?: Contact[];
   municipalityId?: number;
-  provinceId?: number;
 }
 
 export const updateProperty = async (id: string, data: UpdatePropertyData): Promise<Casa> => {

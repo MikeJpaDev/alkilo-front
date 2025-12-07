@@ -5,6 +5,7 @@ import { AuthStatus } from '../interfaces/auth-status.enum';
 import { loginAction } from '../actions/login.action';
 import { useLocalStorage } from '@vueuse/core';
 import { registerAction } from '../actions/register.action';
+import { getUserMe } from '../actions/get-user-me.action';
 
 export const useAuthStore = defineStore('auth', () => {
   const authStatus = ref<AuthStatus>(AuthStatus.Cheking);
@@ -67,6 +68,18 @@ export const useAuthStore = defineStore('auth', () => {
     return false;
   };
 
+  const fetchUserMe = async () => {
+    try {
+      const userData = await getUserMe();
+      user.value = userData;
+      authStatus.value = AuthStatus.Authenticated;
+      return true;
+    } catch (error) {
+      console.error('Error al obtener información del usuario:', error);
+      return false;
+    }
+  };
+
   return {
     user,
     token,
@@ -81,5 +94,6 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     logout,
     register,
+    fetchUserMe,
   };
 });

@@ -191,6 +191,18 @@
         </div>
       </div>
     </DetailsModal>
+
+    <!-- Modal de confirmación de borrado -->
+    <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-sm">
+        <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Confirmar eliminación</h3>
+        <p class="mb-4 text-gray-700 dark:text-gray-300">{{ deleteMessage }}</p>
+        <div class="flex justify-end gap-2">
+          <button @click="cancelDelete" class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Cancelar</button>
+          <button @click="confirmDelete" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">Eliminar</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -282,22 +294,42 @@ const closeViewModal = () => {
   selectedProperty.value = null;
 };
 
+
 const handlePropertySubmit = async (data: CreatePropertyData | UpdatePropertyData) => {
   if (selectedProperty.value) {
-    await updateMutation.mutateAsync({ id: selectedProperty.value.id, data });
+    // No enviar municipalityId en update
+    const { municipalityId, contacts, ...updateData } = data as UpdatePropertyData;
+    await updateMutation.mutateAsync({ id: selectedProperty.value.id, data: updateData });
   } else {
     await createMutation.mutateAsync(data as CreatePropertyData);
   }
 };
 
-const handleDelete = async (id: string) => {
-  if (confirm('¿Estás seguro de que quieres eliminar esta propiedad?')) {
-    await deleteMutation.mutateAsync(id);
+
+const showDeleteModal = ref(false);
+const propertyIdToDelete = ref<string | null>(null);
+const deleteMessage = ref('');
+
+const handleDelete = (id: string) => {
+  propertyIdToDelete.value = id;
+  deleteMessage.value = '¿Estás seguro de que quieres eliminar esta propiedad? Esta acción no se puede deshacer.';
+  showDeleteModal.value = true;
+};
+
+const confirmDelete = async () => {
+  if (propertyIdToDelete.value) {
+    await deleteMutation.mutateAsync(propertyIdToDelete.value);
+    showDeleteModal.value = false;
+    propertyIdToDelete.value = null;
   }
 };
 
-const applyFilters = () => {
-  // Implementar lógica de filtros
-  console.log('Aplicando filtros:', filters.value);
+const cancelDelete = () => {
+  showDeleteModal.value = false;
+  propertyIdToDelete.value = null;
 };
+  // Implementar lógica de filtros
+  const applyFilters = () => {
+    console.log('Aplicando filtros:', filters.value);
+  };
 </script>

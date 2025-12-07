@@ -52,24 +52,70 @@
                     <input v-model.number="form.capacityPeople" type="number" required min="1" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
                   </div>
 
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Metros cuadrados</label>
-                    <input v-model.number="form.metrosCuadrados" type="number" min="0" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
-                  </div>
-
-                  <div>
+                  <div v-if="!isEditing">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Provincia *</label>
-                    <input v-model.number="form.provinceId" type="number" required min="1" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" placeholder="ID de provincia" />
+                    <select v-model.number="form.provinceId" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+                      <option value="" disabled>Selecciona una provincia</option>
+                      <option v-for="province in provinces" :key="province.id" :value="province.id">
+                        {{ province.name }}
+                      </option>
+                    </select>
                   </div>
 
-                  <div>
+                  <div v-if="!isEditing">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Municipio *</label>
-                    <input v-model.number="form.municipalityId" type="number" required min="1" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" placeholder="ID de municipio" />
+                    <select v-model.number="form.municipalityId" required :disabled="!form.provinceId || isLoadingMunicipalities" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50 disabled:cursor-not-allowed">
+                      <option value="" disabled>
+                        {{ isLoadingMunicipalities ? 'Cargando...' : 'Selecciona un municipio' }}
+                      </option>
+                      <option v-for="municipality in municipalities" :key="municipality.id" :value="municipality.id">
+                        {{ municipality.name }}
+                      </option>
+                    </select>
                   </div>
 
                   <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Dirección *</label>
                     <input v-model="form.address" type="text" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" />
+                  </div>
+
+                  <!-- Subida de imágenes solo en edición -->
+                  <div class="md:col-span-2" v-if="isEditing && props.property">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Imágenes</label>
+                    <label class="inline-block">
+                      <span class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors cursor-pointer font-medium">Seleccionar</span>
+                      <input type="file" multiple accept="image/*" @change="onImageChange" class="hidden" />
+                    </label>
+                    <div v-if="selectedImageNames.length" class="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                      <span class="font-medium">Seleccionadas:</span>
+                      <ul class="list-disc list-inside">
+                        <li v-for="name in selectedImageNames" :key="name">{{ name }}</li>
+                      </ul>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                      <img v-for="img in props.property.imageUrls" :key="img.url" :src="img.url" class="w-20 h-20 object-cover rounded" />
+                    </div>
+                  </div>
+
+
+                  <!-- Contacts Section -->
+                  <div class="md:col-span-2" v-if="!isEditing">
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Contactos *</label>
+                      <button type="button" @click="addContact" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
+                        + Agregar contacto
+                      </button>
+                    </div>
+                    <div v-if="form.contacts.length === 0" class="text-sm text-gray-500 dark:text-gray-400 italic">
+                      Debe agregar al menos un contacto
+                    </div>
+                    <div v-for="(contact, index) in form.contacts" :key="index" class="flex gap-2 mb-2">
+                      <input v-model="contact.name" type="text" required placeholder="Nombre" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" />
+                      <input v-model="contact.number" type="tel" required placeholder="+5352123456" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" />
+                      <button type="button" @click="removeContact(index)" class="px-3 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                        ✕
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -92,8 +138,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
+import { useQuery } from '@tanstack/vue-query';
 import type { Casa } from '@/modules/casas/interfaces/casas.interface';
+import { getProvinces, getMunicipalitiesByProvince, type Province, type Municipality, type Contact } from '@/modules/admin/actions';
+import { uploadPropertyImage } from '../actions/upload-property-image.action';
 
 interface PropertyFormData {
   title: string;
@@ -102,10 +151,10 @@ interface PropertyFormData {
   bedroomsCount: number;
   bathroomsCount: number;
   capacityPeople: number;
-  metrosCuadrados?: number;
   address: string;
   municipalityId: number;
-  provinceId: number;
+  provinceId: number; // Solo para el UI, no se envía a la API
+  contacts: Contact[];
 }
 
 const props = defineProps<{
@@ -115,7 +164,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   close: [];
-  submit: [data: PropertyFormData];
+  submit: [data: Omit<PropertyFormData, 'provinceId'>]; // Omitimos provinceId al emitir
 }>();
 
 const isSubmitting = ref(false);
@@ -128,10 +177,34 @@ const form = ref<PropertyFormData>({
   bedroomsCount: 1,
   bathroomsCount: 1,
   capacityPeople: 1,
-  metrosCuadrados: undefined,
   address: '',
-  municipalityId: 1,
-  provinceId: 1,
+  municipalityId: 0,
+  provinceId: 0,
+  contacts: [],
+});
+
+// Fetch provinces
+const { data: provincesData } = useQuery({
+  queryKey: ['provinces'],
+  queryFn: () => getProvinces(1, 20),
+});
+
+const provinces = computed(() => provincesData.value?.data || []);
+
+// Fetch municipalities when provinceId changes
+const { data: municipalitiesData, isLoading: isLoadingMunicipalities } = useQuery({
+  queryKey: ['municipalities', form.value.provinceId],
+  queryFn: () => getMunicipalitiesByProvince(form.value.provinceId),
+  enabled: computed(() => form.value.provinceId > 0),
+});
+
+const municipalities = computed(() => municipalitiesData.value?.municipalities || []);
+
+// Reset municipality when province changes
+watch(() => form.value.provinceId, (newProvinceId, oldProvinceId) => {
+  if (newProvinceId !== oldProvinceId && !isEditing.value) {
+    form.value.municipalityId = 0;
+  }
 });
 
 const resetForm = () => {
@@ -142,11 +215,19 @@ const resetForm = () => {
     bedroomsCount: 1,
     bathroomsCount: 1,
     capacityPeople: 1,
-    metrosCuadrados: undefined,
     address: '',
-    municipalityId: 1,
-    provinceId: 1,
+    municipalityId: 0,
+    provinceId: 0,
+    contacts: [],
   };
+};
+
+const addContact = () => {
+  form.value.contacts.push({ name: '', number: '' });
+};
+
+const removeContact = (index: number) => {
+  form.value.contacts.splice(index, 1);
 };
 
 watch(() => props.property, (newProperty) => {
@@ -159,10 +240,10 @@ watch(() => props.property, (newProperty) => {
       bedroomsCount: newProperty.bedroomsCount,
       bathroomsCount: newProperty.bathroomsCount,
       capacityPeople: newProperty.capacityPeople,
-      metrosCuadrados: newProperty.metrosCuadrados,
       address: newProperty.address,
       municipalityId: newProperty.munipalityId.id,
       provinceId: newProperty.provinceId.id,
+      contacts: newProperty.contacts.map(c => ({ name: c.name, number: c.number })),
     };
   } else {
     isEditing.value = false;
@@ -177,12 +258,37 @@ const handleClose = () => {
 };
 
 const handleSubmit = async () => {
+  // Validar que haya al menos un contacto
+  if (form.value.contacts.length === 0) {
+    return;
+  }
+
   isSubmitting.value = true;
   try {
-    emit('submit', form.value);
+    // Omitir provinceId del formulario
+    const { provinceId, ...dataToSubmit } = form.value;
+    emit('submit', dataToSubmit);
   } finally {
     isSubmitting.value = false;
   }
+};
+
+const selectedImageNames = ref<string[]>([]);
+
+const onImageChange = async (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  if (!input.files || !props.property) return;
+  const files = Array.from(input.files);
+  selectedImageNames.value = files.map(f => f.name);
+  for (const file of files) {
+    try {
+      await uploadPropertyImage(props.property.id, file);
+    } catch (e) {
+      // Puedes mostrar un toast aquí si tienes uno disponible
+      console.error('Error subiendo imagen', e);
+    }
+  }
+  // Opcional: podrías emitir un evento o recargar imágenes aquí
 };
 </script>
 
