@@ -8,8 +8,11 @@ import { registerAction } from '../actions/register.action';
 
 export const useAuthStore = defineStore('auth', () => {
   const authStatus = ref<AuthStatus>(AuthStatus.Cheking);
-  const user = ref<User | undefined>();
-  const token = ref(useLocalStorage('token', ''));
+
+  // Usar useLocalStorage directamente para que sea reactivo y persista
+  const user = useLocalStorage<User | null>('user', null);
+  const token = useLocalStorage<string>('token', '');
+  const userToken = ref<User | null>(useLocalStorage<User | null>('userToken', null));
 
   const login = async (email: string, password: string) => {
     try {
@@ -19,11 +22,11 @@ export const useAuthStore = defineStore('auth', () => {
         return false;
       }
 
-      console.log('que es esto pp dios', loginResult);
-
       user.value = loginResult.data;
+      userToken.value = { ...loginResult.data };
       token.value = loginResult.token;
       authStatus.value = AuthStatus.Authenticated;
+      console.log('store despues del login', localStorage.getItem('userToken'), token.value);
       return true;
     } catch (error) {
       console.log(error);
@@ -59,8 +62,8 @@ export const useAuthStore = defineStore('auth', () => {
 
   const logout = () => {
     authStatus.value = AuthStatus.Unauthenticated;
-    user.value = undefined;
-    token.value = null;
+    user.value = null; // limpia y persiste en localStorage
+    token.value = ''; // limpia y persiste en localStorage
     return false;
   };
 
