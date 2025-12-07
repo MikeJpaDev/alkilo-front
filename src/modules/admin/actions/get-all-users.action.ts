@@ -12,7 +12,7 @@ interface UsersResponse {
 }
 
 export const getAllUsers = async (page = 1, limit = 10): Promise<UsersResponse> => {
-  const { data } = await AlkiloApi.get<UsersResponse>('/users', {
+  const { data } = await AlkiloApi.get<UsersResponse>('/auth', {
     params: { page, limit }
   });
   return data;

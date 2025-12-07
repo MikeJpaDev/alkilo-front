@@ -1,17 +1,22 @@
 import { AlkiloApi } from '@/api/AlkiloApi';
 
 interface AdminStats {
-  totalProperties: number;
-  totalUsers: number;
-  totalBookings: number;
-  totalRevenue: number;
-  propertiesGrowth: number;
-  usersGrowth: number;
-  bookingsGrowth: number;
-  revenueGrowth: number;
+  users: {
+    total: number;
+    active: number;
+    inactive: number;
+  };
+  casas: {
+    total: number;
+  };
+  reviews: {
+    total: number;
+    averageRating: number;
+  };
+  timestamp: string;
 }
 
 export const getAdminStats = async (): Promise<AdminStats> => {
-  const { data } = await AlkiloApi.get<AdminStats>('/stats');
+  const { data } = await AlkiloApi.get<AdminStats>('/dashboard/stats');
   return data;
 };

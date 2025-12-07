@@ -5,3 +5,7 @@ export { getAllReviews } from './get-all-reviews.action';
 export { deleteProperty } from './delete-property.action';
 export { deleteUser } from './delete-user.action';
 export { deleteReview } from './delete-review.action';
+export { createProperty } from './create-property.action';
+export { updateProperty } from './update-property.action';
+export { createUser } from './create-user.action';
+export { updateUser } from './update-user.action';

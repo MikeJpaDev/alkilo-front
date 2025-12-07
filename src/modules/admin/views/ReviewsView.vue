@@ -60,7 +60,7 @@
         <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
           <span class="text-xs text-gray-500 dark:text-gray-400">ID: {{ review.id }}</span>
           <div class="flex gap-2">
-            <button class="px-3 py-1.5 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
+            <button @click="openViewModal(review)" class="px-3 py-1.5 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
               Ver detalles
             </button>
             <button @click="handleDelete(review.id)" class="px-3 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
@@ -85,6 +85,37 @@
         </button>
       </div>
     </div>
+
+    <!-- Details Modal -->
+    <DetailsModal :is-open="isViewModalOpen" title="Detalles de la Reseña" @close="closeViewModal">
+      <div v-if="selectedReview" class="space-y-4">
+        <div class="flex items-center gap-4 mb-6">
+          <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-xl">
+            {{ selectedReview.user.firstName.charAt(0) }}{{ selectedReview.user.lastName.charAt(0) }}
+          </div>
+          <div>
+            <h4 class="text-lg font-semibold text-gray-900 dark:text-white">{{ selectedReview.user.firstName }} {{ selectedReview.user.lastName }}</h4>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ new Date(selectedReview.createdAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) }}</p>
+          </div>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Calificación</p>
+          <div class="flex items-center gap-1">
+            <svg v-for="n in 5" :key="n" :class="['w-6 h-6', n <= selectedReview.rating ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600']" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+            </svg>
+            <span class="ml-2 text-lg font-semibold text-gray-900 dark:text-white">{{ selectedReview.rating }}/5</span>
+          </div>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Comentario</p>
+          <p class="text-base text-gray-900 dark:text-white">{{ selectedReview.comment }}</p>
+        </div>
+        <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+          <p class="text-xs text-gray-500 dark:text-gray-400">ID de la reseña: {{ selectedReview.id }}</p>
+        </div>
+      </div>
+    </DetailsModal>
   </div>
 </template>
 
@@ -92,13 +123,20 @@
 import { ref } from 'vue';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
 import { getAllReviews, deleteReview } from '../actions';
+import type { Review } from '@/modules/casas/interfaces/casas.interface';
+import DetailsModal from '../components/DetailsModal.vue';
+import { useToast } from 'vue-toastification';
 
+const toast = useToast();
 const queryClient = useQueryClient();
 const currentPage = ref(1);
 const filters = ref({
   search: '',
   rating: ''
 });
+
+const isViewModalOpen = ref(false);
+const selectedReview = ref<Review | null>(null);
 
 const { data: reviews, isLoading } = useQuery({
   queryKey: ['adminReviewsList', currentPage],
@@ -109,8 +147,22 @@ const deleteMutation = useMutation({
   mutationFn: deleteReview,
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['adminReviewsList'] });
+    toast.success('Reseña eliminada exitosamente');
+  },
+  onError: () => {
+    toast.error('Error al eliminar la reseña');
   },
 });
+
+const openViewModal = (review: Review) => {
+  selectedReview.value = review;
+  isViewModalOpen.value = true;
+};
+
+const closeViewModal = () => {
+  isViewModalOpen.value = false;
+  selectedReview.value = null;
+};
 
 const handleDelete = async (id: number) => {
   if (confirm('¿Estás seguro de que quieres eliminar esta reseña?')) {

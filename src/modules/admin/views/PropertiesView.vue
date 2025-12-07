@@ -6,7 +6,7 @@
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Propiedades</h2>
         <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Administra todas las propiedades del sistema</p>
       </div>
-      <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
+      <button @click="openCreateModal" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
         </svg>
@@ -94,18 +94,18 @@
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center gap-2">
-                  <button class="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
+                  <button @click="openViewModal(casa)" title="Ver detalles" class="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                     </svg>
                   </button>
-                  <button class="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                  <button @click="openEditModal(casa)" title="Editar" class="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                     </svg>
                   </button>
-                  <button @click="handleDelete(casa.id)" class="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                  <button @click="handleDelete(casa.id)" title="Eliminar" class="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                     </svg>
@@ -134,14 +134,77 @@
         </div>
       </div>
     </div>
+
+    <!-- Modals -->
+    <PropertyModal
+      :is-open="isPropertyModalOpen"
+      :property="selectedProperty"
+      @close="closePropertyModal"
+      @submit="handlePropertySubmit"
+    />
+
+    <DetailsModal :is-open="isViewModalOpen" title="Detalles de la Propiedad" @close="closeViewModal">
+      <div v-if="selectedProperty" class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Título</p>
+            <p class="text-base text-gray-900 dark:text-white">{{ selectedProperty.title }}</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Precio por noche</p>
+            <p class="text-base text-gray-900 dark:text-white">${{ selectedProperty.pricePerNight }}</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Ubicación</p>
+            <p class="text-base text-gray-900 dark:text-white">{{ selectedProperty.munipalityId.name }}, {{ selectedProperty.provinceId.name }}</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Dirección</p>
+            <p class="text-base text-gray-900 dark:text-white">{{ selectedProperty.address }}</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Habitaciones</p>
+            <p class="text-base text-gray-900 dark:text-white">{{ selectedProperty.bedroomsCount }}</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Baños</p>
+            <p class="text-base text-gray-900 dark:text-white">{{ selectedProperty.bathroomsCount }}</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Capacidad</p>
+            <p class="text-base text-gray-900 dark:text-white">{{ selectedProperty.capacityPeople }} personas</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Metros cuadrados</p>
+            <p class="text-base text-gray-900 dark:text-white">{{ selectedProperty.metrosCuadrados || 'N/A' }} m²</p>
+          </div>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Descripción</p>
+          <p class="text-base text-gray-900 dark:text-white">{{ selectedProperty.description }}</p>
+        </div>
+        <div v-if="selectedProperty.imageUrls && selectedProperty.imageUrls.length > 0">
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Imágenes</p>
+          <div class="grid grid-cols-3 gap-2">
+            <img v-for="(img, idx) in selectedProperty.imageUrls" :key="idx" :src="img.url" :alt="`Imagen ${idx + 1}`" class="w-full h-24 object-cover rounded-lg" />
+          </div>
+        </div>
+      </div>
+    </DetailsModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
-import { getAllProperties, deleteProperty } from '../actions';
+import { getAllProperties, deleteProperty, createProperty, updateProperty } from '../actions';
+import type { Casa } from '@/modules/casas/interfaces/casas.interface';
+import type { CreatePropertyData, UpdatePropertyData } from '../actions/create-property.action';
+import PropertyModal from '../components/PropertyModal.vue';
+import DetailsModal from '../components/DetailsModal.vue';
+import { useToast } from 'vue-toastification';
 
+const toast = useToast();
 const queryClient = useQueryClient();
 const currentPage = ref(1);
 const filters = ref({
@@ -149,6 +212,10 @@ const filters = ref({
   province: '',
   status: ''
 });
+
+const isPropertyModalOpen = ref(false);
+const isViewModalOpen = ref(false);
+const selectedProperty = ref<Casa | null>(null);
 
 const { data: properties, isLoading } = useQuery({
   queryKey: ['adminPropertiesList', currentPage],
@@ -159,8 +226,69 @@ const deleteMutation = useMutation({
   mutationFn: deleteProperty,
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['adminPropertiesList'] });
+    toast.success('Propiedad eliminada exitosamente');
+  },
+  onError: () => {
+    toast.error('Error al eliminar la propiedad');
   },
 });
+
+const createMutation = useMutation({
+  mutationFn: createProperty,
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['adminPropertiesList'] });
+    toast.success('Propiedad creada exitosamente');
+    closePropertyModal();
+  },
+  onError: () => {
+    toast.error('Error al crear la propiedad');
+  },
+});
+
+const updateMutation = useMutation({
+  mutationFn: ({ id, data }: { id: string; data: UpdatePropertyData }) => updateProperty(id, data),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['adminPropertiesList'] });
+    toast.success('Propiedad actualizada exitosamente');
+    closePropertyModal();
+  },
+  onError: () => {
+    toast.error('Error al actualizar la propiedad');
+  },
+});
+
+const openCreateModal = () => {
+  selectedProperty.value = null;
+  isPropertyModalOpen.value = true;
+};
+
+const openEditModal = (casa: Casa) => {
+  selectedProperty.value = casa;
+  isPropertyModalOpen.value = true;
+};
+
+const openViewModal = (casa: Casa) => {
+  selectedProperty.value = casa;
+  isViewModalOpen.value = true;
+};
+
+const closePropertyModal = () => {
+  isPropertyModalOpen.value = false;
+  selectedProperty.value = null;
+};
+
+const closeViewModal = () => {
+  isViewModalOpen.value = false;
+  selectedProperty.value = null;
+};
+
+const handlePropertySubmit = async (data: CreatePropertyData | UpdatePropertyData) => {
+  if (selectedProperty.value) {
+    await updateMutation.mutateAsync({ id: selectedProperty.value.id, data });
+  } else {
+    await createMutation.mutateAsync(data as CreatePropertyData);
+  }
+};
 
 const handleDelete = async (id: string) => {
   if (confirm('¿Estás seguro de que quieres eliminar esta propiedad?')) {

@@ -6,7 +6,7 @@
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Usuarios</h2>
         <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Administra todos los usuarios del sistema</p>
       </div>
-      <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
+      <button @click="openCreateModal" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
         </svg>
@@ -82,18 +82,18 @@
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center gap-2">
-                  <button class="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
+                  <button @click="openViewModal(user)" title="Ver detalles" class="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                     </svg>
                   </button>
-                  <button class="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                  <button @click="openEditModal(user)" title="Editar" class="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                     </svg>
                   </button>
-                  <button @click="handleDelete(user.id)" class="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                  <button @click="handleDelete(user.id)" title="Eliminar" class="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                     </svg>
@@ -122,21 +122,71 @@
         </div>
       </div>
     </div>
+
+    <!-- Modals -->
+    <UserModal
+      :is-open="isUserModalOpen"
+      :user="selectedUser"
+      @close="closeUserModal"
+      @submit="handleUserSubmit"
+    />
+
+    <DetailsModal :is-open="isViewModalOpen" title="Detalles del Usuario" @close="closeViewModal">
+      <div v-if="selectedUser" class="space-y-4">
+        <div class="flex items-center gap-4 mb-6">
+          <img v-if="selectedUser.profilePictureUrl" :src="selectedUser.profilePictureUrl" :alt="selectedUser.firstName" class="w-20 h-20 rounded-full object-cover" />
+          <div v-else class="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-semibold text-2xl">
+            {{ selectedUser.firstName.charAt(0) }}{{ selectedUser.lastName.charAt(0) }}
+          </div>
+          <div>
+            <h4 class="text-xl font-semibold text-gray-900 dark:text-white">{{ selectedUser.firstName }} {{ selectedUser.lastName }}</h4>
+            <p class="text-sm text-gray-500 dark:text-gray-400">ID: {{ selectedUser.id }}</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">CI</p>
+            <p class="text-base text-gray-900 dark:text-white">{{ selectedUser.ci }}</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Dirección</p>
+            <p class="text-base text-gray-900 dark:text-white">{{ selectedUser.address }}</p>
+          </div>
+          <div class="col-span-2">
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Roles</p>
+            <div class="flex flex-wrap gap-2">
+              <span v-for="role in selectedUser.roles" :key="role" :class="getRoleClass(role)">
+                {{ getRoleLabel(role) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </DetailsModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
-import { getAllUsers, deleteUser } from '../actions';
-import type { UserRole } from '@/modules/auth/interfaces/user.interface';
+import { getAllUsers, deleteUser, createUser, updateUser } from '../actions';
+import type { User, UserRole } from '@/modules/auth/interfaces/user.interface';
+import type { CreateUserData, UpdateUserData } from '../actions/create-user.action';
+import UserModal from '../components/UserModal.vue';
+import DetailsModal from '../components/DetailsModal.vue';
+import { useToast } from 'vue-toastification';
 
+const toast = useToast();
 const queryClient = useQueryClient();
 const currentPage = ref(1);
 const filters = ref({
   search: '',
   role: ''
 });
+
+const isUserModalOpen = ref(false);
+const isViewModalOpen = ref(false);
+const selectedUser = ref<User | null>(null);
 
 const { data: users, isLoading } = useQuery({
   queryKey: ['adminUsersList', currentPage],
@@ -147,8 +197,69 @@ const deleteMutation = useMutation({
   mutationFn: deleteUser,
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['adminUsersList'] });
+    toast.success('Usuario eliminado exitosamente');
+  },
+  onError: () => {
+    toast.error('Error al eliminar el usuario');
   },
 });
+
+const createMutation = useMutation({
+  mutationFn: createUser,
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['adminUsersList'] });
+    toast.success('Usuario creado exitosamente');
+    closeUserModal();
+  },
+  onError: () => {
+    toast.error('Error al crear el usuario');
+  },
+});
+
+const updateMutation = useMutation({
+  mutationFn: ({ id, data }: { id: string; data: UpdateUserData }) => updateUser(id, data),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['adminUsersList'] });
+    toast.success('Usuario actualizado exitosamente');
+    closeUserModal();
+  },
+  onError: () => {
+    toast.error('Error al actualizar el usuario');
+  },
+});
+
+const openCreateModal = () => {
+  selectedUser.value = null;
+  isUserModalOpen.value = true;
+};
+
+const openEditModal = (user: User) => {
+  selectedUser.value = user;
+  isUserModalOpen.value = true;
+};
+
+const openViewModal = (user: User) => {
+  selectedUser.value = user;
+  isViewModalOpen.value = true;
+};
+
+const closeUserModal = () => {
+  isUserModalOpen.value = false;
+  selectedUser.value = null;
+};
+
+const closeViewModal = () => {
+  isViewModalOpen.value = false;
+  selectedUser.value = null;
+};
+
+const handleUserSubmit = async (data: CreateUserData | Partial<CreateUserData>) => {
+  if (selectedUser.value) {
+    await updateMutation.mutateAsync({ id: selectedUser.value.id, data: data as UpdateUserData });
+  } else {
+    await createMutation.mutateAsync(data as CreateUserData);
+  }
+};
 
 const handleDelete = async (id: string) => {
   if (confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
