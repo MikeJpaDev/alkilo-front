@@ -1,7 +1,9 @@
 <template>
   <!-- Title -->
   <div class="pt-32 bg-white dark:bg-gray-900 transition-colors">
-    <h1 class="text-center text-2xl font-bold text-gray-800 dark:text-gray-100">Casas en Alkilo</h1>
+    <h1 class="text-center text-2xl font-bold text-gray-800 dark:text-gray-100">
+      {{ $t('Casas en') }}
+    </h1>
   </div>
 
   <LoginActions v-if="isLogin" />

@@ -20,7 +20,7 @@
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400'
               "
             >
-              Inicio
+              {{ $t('Inicio') }}
             </RouterLink>
           </li>
           <li>
@@ -33,7 +33,7 @@
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400'
               "
             >
-              Nosotros
+              {{ $t('Nosotros') }}
             </RouterLink>
           </li>
           <li>
@@ -46,7 +46,7 @@
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400'
               "
             >
-              Servicios
+              {{ $t('Servicios') }}
             </RouterLink>
           </li>
           <li>
@@ -59,7 +59,7 @@
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400'
               "
             >
-              Contacto
+              {{ $t('Contactos') }}
             </RouterLink>
           </li>
         </ul>
@@ -86,13 +86,28 @@
           </svg>
         </button>
 
-        <!-- Login Button -->
+        <!-- Language Toggle Button -->
+        <button
+          @click="toggleLanguage"
+          type="button"
+          class="p-2.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors duration-200 flex items-center gap-2"
+          title="Cambiar idioma"
+        >
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM7 9h10v2H7V9zm0 4h7v2H7v-2z"
+            />
+          </svg>
+          <span class="text-sm font-medium">{{ localeLabel }}</span>
+        </button>
+
+        <!-- Login / Register / Logout Buttons -->
         <RouterLink to="/auth/login" v-if="!isLogin">
           <button
             type="button"
             class="hidden border-2 border-blue-600 dark:border-blue-500 py-2 px-5 text-center text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 md:inline-block rounded-lg transition-all duration-200"
           >
-            Iniciar sesión
+            {{ $t('Login') }}
           </button>
         </RouterLink>
         <RouterLink to="/auth/register" v-if="!isLogin">
@@ -100,7 +115,7 @@
             type="button"
             class="rounded-lg bg-blue-600 dark:bg-blue-500 py-2 px-5 text-center text-sm font-medium text-white hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 md:mr-0 transition-all duration-200 shadow-sm hover:shadow"
           >
-            Registrarse
+            {{ $t('Registrarse') }}
           </button>
         </RouterLink>
         <RouterLink to="/auth/register" v-if="isLogin">
@@ -159,7 +174,7 @@
               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400'
           "
         >
-          Inicio
+          {{ $t('Inicio') }}
         </RouterLink>
 
         <RouterLink
@@ -172,7 +187,7 @@
               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400'
           "
         >
-          Nosotros
+          {{ $t('Nosotros') }}
         </RouterLink>
 
         <RouterLink
@@ -185,7 +200,7 @@
               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400'
           "
         >
-          Servicios
+          {{ $t('Servicios') }}
         </RouterLink>
 
         <RouterLink
@@ -198,7 +213,7 @@
               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400'
           "
         >
-          Contacto
+          {{ $t('Contactos') }}
         </RouterLink>
 
         <div class="pt-2 border-t border-gray-200 dark:border-gray-700">
@@ -207,7 +222,7 @@
             to="/auth/login"
             class="block px-3 py-2 rounded-md text-base font-medium text-blue-600 dark:text-blue-400"
             v-if="!isLogin"
-            >Iniciar sesión</RouterLink
+            >{{ $t('Login') }}</RouterLink
           >
           <button
             @click="logout"
@@ -221,7 +236,7 @@
             @click="mobileMenuOpen = false"
             to="/auth/register"
             class="mt-1 block px-3 py-2 rounded-md text-base font-medium bg-blue-600 text-white"
-            >Registrarse</RouterLink
+            >{{ $t('Registrarse') }}</RouterLink
           >
         </div>
       </div>
@@ -230,10 +245,11 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useTheme } from '@/composables/useTheme';
 import { useAuthStore } from '@/modules/auth/store/auth.store';
+import { useI18n } from 'vue-i18n';
 
 console.log('aquiiiiiiiiiiiiii', ref(localStorage.getItem('user')));
 const route = useRoute();
@@ -247,6 +263,15 @@ const logout = async () => {
 
 const mobileMenuOpen = ref(false);
 const isLogin = ref(localStorage.getItem('token'));
+
+const { locale } = useI18n();
+
+const toggleLanguage = () => {
+  locale.value = locale.value === 'en' ? 'es' : 'en';
+  localStorage.setItem('locale', locale.value);
+};
+
+const localeLabel = computed(() => (locale.value === 'en' ? 'EN' : 'ES'));
 
 // Close mobile menu on route change
 watch(

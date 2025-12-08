@@ -53,7 +53,7 @@
               />
             </svg>
 
-            <button class="text-sm">Ver Detalles</button>
+            <button class="text-sm">{{ $t('Ver Detalles') }}</button>
           </div>
         </div>
       </div>

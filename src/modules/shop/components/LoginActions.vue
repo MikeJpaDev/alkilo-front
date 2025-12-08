@@ -23,9 +23,9 @@
       </svg>
       <span>Crear Casa</span>
     </RouterLink>
-    <a
+    <RouterLink
+      to="admin/dashboard"
       rel="noopener noreferrer"
-      href="#"
       class="flex items-center flex-shrink-0 px-5 py-3 space-x-2 rounded-t-lg text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
     >
       <svg
@@ -41,8 +41,8 @@
         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
         <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
       </svg>
-      <span>Corrupti</span>
-    </a>
+      <span>Administración</span>
+    </RouterLink>
     <a
       rel="noopener noreferrer"
       href="#"

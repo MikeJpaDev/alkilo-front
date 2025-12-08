@@ -9,7 +9,9 @@ defineProps({
 </script>
 
 <template>
-  <section class="py-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 transition-colors">
+  <section
+    class="py-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 transition-colors"
+  >
     <div class="container mx-auto px-4 max-w-7xl">
       <div class="flex flex-col md:flex-row gap-3">
         <!-- Ubicación -->
@@ -25,7 +27,10 @@ defineProps({
         <!-- Precio mínimo -->
         <div class="flex-1 md:flex-[2]">
           <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">$</span>
+            <span
+              class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium"
+              >$</span
+            >
             <input
               v-model="filters.minPrice"
               type="number"
@@ -40,7 +45,10 @@ defineProps({
         <!-- Precio máximo -->
         <div class="flex-1 md:flex-[2]">
           <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">$</span>
+            <span
+              class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium"
+              >$</span
+            >
             <input
               v-model="filters.maxPrice"
               type="number"
@@ -58,7 +66,7 @@ defineProps({
             v-model="filters.bedrooms"
             class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 appearance-none"
           >
-            <option value="">Habitaciones</option>
+            <option value="">{{ $t('Habitaciones') }}</option>
             <option value="1">1 habitación</option>
             <option value="2">2 habitaciones</option>
             <option value="3">3 habitaciones</option>
@@ -71,7 +79,7 @@ defineProps({
           <button
             class="w-full px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all duration-200"
           >
-            Buscar
+            {{ $t('Buscar') }}
           </button>
         </div>
       </div>
