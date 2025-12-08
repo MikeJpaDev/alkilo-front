@@ -3,8 +3,38 @@ import { useQuery } from '@tanstack/vue-query';
 import { useRoute, useRouter } from 'vue-router';
 import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { getCasaActions } from '../actions/get-casa.actions';
+import { createReview } from '../actions/create-review.action';
 import type { Casa } from '../interfaces/casas.interface';
 import ContactNumbers from '@/modules/casas/components/ContactNumbers.vue';
+
+// Estado para el formulario de reseña
+const reviewRating = ref(5);
+const reviewComment = ref('');
+const reviewLoading = ref(false);
+const reviewError = ref('');
+const reviewSuccess = ref(false);
+
+const submitReview = async () => {
+  reviewLoading.value = true;
+  reviewError.value = '';
+  reviewSuccess.value = false;
+  try {
+    await createReview(houseId, {
+      rating: reviewRating.value,
+      comment: reviewComment.value,
+    });
+    reviewSuccess.value = true;
+    // Opcional: recargar datos de la casa para mostrar la nueva reseña
+    window.location.reload();
+  } catch (err: any) {
+    const message = (err && typeof err === 'object' && 'response' in err && err.response?.data?.message)
+      ? err.response.data.message
+      : 'Error al enviar la reseña';
+    reviewError.value = message;
+  } finally {
+    reviewLoading.value = false;
+  }
+};
 
 const router = useRouter();
 const route = useRoute();
@@ -490,14 +520,10 @@ console.log(house.value);
             class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700"
           >
             <h5 class="font-bold text-gray-900 dark:text-gray-100 mb-4">Deja tu reseña</h5>
-            <form @submit.prevent class="space-y-4">
+            <form @submit.prevent="submitReview" class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >Calificación</label
-                >
-                <select
-                  class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                >
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Calificación</label>
+                <select v-model="reviewRating" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                   <option value="5">5 estrellas</option>
                   <option value="4">4 estrellas</option>
                   <option value="3">3 estrellas</option>
@@ -506,21 +532,15 @@ console.log(house.value);
                 </select>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >Comentario</label
-                >
-                <textarea
-                  rows="4"
-                  class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
-                  placeholder="Comparte tu experiencia..."
-                ></textarea>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Comentario</label>
+                <textarea v-model="reviewComment" rows="4" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" placeholder="Comparte tu experiencia..."></textarea>
               </div>
-              <button
-                type="submit"
-                class="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200"
-              >
-                Enviar reseña
+              <button type="submit" :disabled="reviewLoading" class="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200">
+                <span v-if="reviewLoading">Enviando...</span>
+                <span v-else>Enviar reseña</span>
               </button>
+              <p v-if="reviewError" class="text-red-500 mt-2">{{ reviewError }}</p>
+              <p v-if="reviewSuccess" class="text-green-600 mt-2">¡Reseña enviada correctamente!</p>
             </form>
           </div>
         </div>
