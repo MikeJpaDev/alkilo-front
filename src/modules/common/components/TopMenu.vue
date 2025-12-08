@@ -238,6 +238,13 @@
             class="mt-1 block px-3 py-2 rounded-md text-base font-medium bg-blue-600 text-white"
             >{{ $t('Registrarse') }}</RouterLink
           >
+          <RouterLink
+            v-if="isLogin"
+            @click="mobileMenuOpen = false"
+            to="/mis-casas"
+            class="mt-1 block px-3 py-2 rounded-md text-base font-medium bg-blue-600 text-white"
+            >{{ $t('Mis Casas') }}</RouterLink
+          >
         </div>
       </div>
     </div>

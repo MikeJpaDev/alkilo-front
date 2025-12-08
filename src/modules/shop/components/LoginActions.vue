@@ -43,6 +43,26 @@
       </svg>
       <span>Administración</span>
     </RouterLink>
+    <RouterLink
+      to="{ name: 'myCasas' }"
+      rel="noopener noreferrer"
+      class="flex items-center flex-shrink-0 px-5 py-3 space-x-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="w-4 h-4"
+      >
+        <circle cx="12" cy="12" r="10"></circle>
+        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+      </svg>
+      <span>Mis Casas</span>
+    </RouterLink>
     <a
       rel="noopener noreferrer"
       href="#"
