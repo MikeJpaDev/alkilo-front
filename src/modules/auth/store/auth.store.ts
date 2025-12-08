@@ -6,6 +6,7 @@ import { loginAction } from '../actions/login.action';
 import { useLocalStorage } from '@vueuse/core';
 import { registerAction } from '../actions/register.action';
 import { getUserMe } from '../actions/get-user-me.action';
+import { checkAuthAction } from '../actions/check-auth.actions';
 
 export const useAuthStore = defineStore('auth', () => {
   const authStatus = ref<AuthStatus>(AuthStatus.Cheking);
@@ -62,6 +63,7 @@ export const useAuthStore = defineStore('auth', () => {
   };
 
   const logout = () => {
+    console.log('Ejecutando logout');
     authStatus.value = AuthStatus.Unauthenticated;
     user.value = null; // limpia y persiste en localStorage
     token.value = ''; // limpia y persiste en localStorage
@@ -80,6 +82,28 @@ export const useAuthStore = defineStore('auth', () => {
     }
   };
 
+  // Verifica el estado de autenticación al iniciar la app
+  const checkAuthStatus = async (): Promise<boolean> => {
+    // intentamos usar el token reactivo primero, si no está usar localStorage directamente
+    const storedToken = token.value || (localStorage.getItem('token') ?? '');
+    if (!storedToken) {
+      logout();
+      return false;
+    }
+
+    // aseguramos que el token reactivo esté poblado
+    token.value = storedToken;
+
+    // intentar obtener datos del usuario con el token
+    const ok = await fetchUserMe();
+    if (!ok) {
+      logout();
+      return false;
+    }
+
+    return true;
+  };
+
   return {
     user,
     token,
@@ -95,5 +119,6 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     register,
     fetchUserMe,
+    checkAuthStatus,
   };
 });
