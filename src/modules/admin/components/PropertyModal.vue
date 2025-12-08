@@ -84,8 +84,9 @@
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Imágenes</label>
                     <label class="inline-block">
                       <span class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors cursor-pointer font-medium">Seleccionar</span>
-                      <input type="file" multiple accept="image/*" @change="onImageChange" class="hidden" />
+                      <input ref="imageInputRef" type="file" multiple accept="image/*" @change="onImageChange" class="hidden" />
                     </label>
+                    <button v-if="selectedImageNames.length" type="button" @click="clearImageSelection" class="ml-2 px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 rounded">Quitar selección</button>
                     <div v-if="selectedImageNames.length" class="mt-2 text-sm text-gray-700 dark:text-gray-300">
                       <span class="font-medium">Seleccionadas:</span>
                       <ul class="list-disc list-inside">
@@ -93,7 +94,19 @@
                       </ul>
                     </div>
                     <div class="flex flex-wrap gap-2 mt-2">
-                      <img v-for="img in props.property.imageUrls" :key="img.url" :src="img.url" class="w-20 h-20 object-cover rounded" />
+                      <div v-for="img in props.property.imageUrls" :key="img.url" class="relative group">
+                        <img :src="img.url" class="w-20 h-20 object-cover rounded" />
+                        <button
+                          type="button"
+                          class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-80 hover:opacity-100 transition"
+                          :disabled="deletingImage === img.fileName"
+                          @click="handleDeleteImage(img.fileName)"
+                          title="Eliminar imagen"
+                        >
+                          <span v-if="deletingImage === img.fileName">...</span>
+                          <span v-else>✕</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -143,6 +156,7 @@ import { useQuery } from '@tanstack/vue-query';
 import type { Casa } from '@/modules/casas/interfaces/casas.interface';
 import { getProvinces, getMunicipalitiesByProvince, type Province, type Municipality, type Contact } from '@/modules/admin/actions';
 import { uploadPropertyImage } from '../actions/upload-property-image.action';
+import { deletePropertyImage } from '../actions/delete-property-image.action';
 
 interface PropertyFormData {
   title: string;
@@ -274,6 +288,25 @@ const handleSubmit = async () => {
 };
 
 const selectedImageNames = ref<string[]>([]);
+const imageInputRef = ref<HTMLInputElement | null>(null);
+const deletingImage = ref<string | null>(null);
+
+const refreshPropertyImages = async () => {
+  if (props.property) {
+    // Traer la propiedad actualizada desde la API
+    const { getCasaActions } = await import('@/modules/casas/actions/get-casa.actions');
+    const updated = await getCasaActions(props.property.id);
+    // Actualizar las imágenes en el objeto property (reactividad limitada, pero forzamos update)
+    props.property.imageUrls.splice(0, props.property.imageUrls.length, ...updated.imageUrls);
+  }
+};
+
+const clearImageSelection = () => {
+  selectedImageNames.value = [];
+  if (imageInputRef.value) {
+    imageInputRef.value.value = '';
+  }
+};
 
 const onImageChange = async (event: Event) => {
   const input = event.target as HTMLInputElement;
@@ -288,7 +321,22 @@ const onImageChange = async (event: Event) => {
       console.error('Error subiendo imagen', e);
     }
   }
-  // Opcional: podrías emitir un evento o recargar imágenes aquí
+  await refreshPropertyImages();
+  // No limpiar la selección automáticamente
+};
+
+const handleDeleteImage = async (fileName: string) => {
+  if (!props.property) return;
+  deletingImage.value = fileName;
+  try {
+    await deletePropertyImage(props.property.id, fileName);
+    await refreshPropertyImages();
+  } catch (e) {
+    // Puedes mostrar un toast aquí si tienes uno disponible
+    console.error('Error eliminando imagen', e);
+  } finally {
+    deletingImage.value = null;
+  }
 };
 </script>
 
