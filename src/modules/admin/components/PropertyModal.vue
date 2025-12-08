@@ -86,28 +86,6 @@
                       <span class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors cursor-pointer font-medium">Seleccionar</span>
                       <input ref="imageInputRef" type="file" multiple accept="image/*" @change="onImageChange" class="hidden" />
                     </label>
-                    <button v-if="selectedImageNames.length" type="button" @click="clearImageSelection" class="ml-2 px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 rounded">Quitar selección</button>
-                    <div v-if="selectedImageNames.length" class="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                      <span class="font-medium">Seleccionadas:</span>
-                      <ul class="list-disc list-inside">
-                        <li v-for="name in selectedImageNames" :key="name">{{ name }}</li>
-                      </ul>
-                    </div>
-                    <div class="flex flex-wrap gap-2 mt-2">
-                      <div v-for="img in props.property.imageUrls" :key="img.url" class="relative group">
-                        <img :src="img.url" class="w-20 h-20 object-cover rounded" />
-                        <button
-                          type="button"
-                          class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-80 hover:opacity-100 transition"
-                          :disabled="deletingImage === img.fileName"
-                          @click="handleDeleteImage(img.fileName)"
-                          title="Eliminar imagen"
-                        >
-                          <span v-if="deletingImage === img.fileName">...</span>
-                          <span v-else>✕</span>
-                        </button>
-                      </div>
-                    </div>
                   </div>
 
 
@@ -128,6 +106,38 @@
                       <button type="button" @click="removeContact(index)" class="px-3 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
                         ✕
                       </button>
+                    </div>
+                  </div>
+
+                  <!-- Galería de imágenes (localImages) -->
+                  <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Imágenes (Galería)</label>
+                    <div class="flex flex-wrap gap-2">
+                      <div v-for="img in props.property?.imageUrls || []" :key="img.url" class="relative group">
+                        <img :src="img.url" class="w-20 h-20 object-cover rounded" />
+                        <button
+                          type="button"
+                          class="absolute top-0 right-0 bg-white text-red-500 rounded-full w-5 h-5 flex items-center justify-center shadow hover:bg-red-100 transition"
+                          :disabled="deletingImage === img.fileName"
+                          @click="handleDeleteImage(img.fileName)"
+                          title="Eliminar imagen"
+                        >
+                          <span class="text-base leading-none">×</span>
+                        </button>
+                      </div>
+                    </div>
+
+
+
+                    <!-- Lista de imágenes pendientes de subir -->
+                    <div v-if="pendingImages.length" class="mt-2">
+                      <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Imágenes a subir:</div>
+                      <ul class="space-y-1">
+                        <li v-for="file in pendingImages" :key="file.name + file.size" class="flex items-center gap-2">
+                          <span class="truncate max-w-xs">{{ file.name }}</span>
+                          <button type="button" @click="removePendingImage(file)" class="text-red-600 hover:text-red-800 text-xs">✕</button>
+                        </li>
+                      </ul>
                     </div>
                   </div>
                 </div>
@@ -154,7 +164,7 @@
 import { ref, watch, computed } from 'vue';
 import { useQuery } from '@tanstack/vue-query';
 import type { Casa } from '@/modules/casas/interfaces/casas.interface';
-import { getProvinces, getMunicipalitiesByProvince, type Province, type Municipality, type Contact } from '@/modules/admin/actions';
+import { getProvinces, getMunicipalitiesByProvince, type Contact } from '@/modules/admin/actions';
 import { uploadPropertyImage } from '../actions/upload-property-image.action';
 import { deletePropertyImage } from '../actions/delete-property-image.action';
 
@@ -267,8 +277,43 @@ watch(() => props.property, (newProperty) => {
 
 const handleClose = () => {
   if (!isSubmitting.value) {
+    pendingImages.value = [];
     emit('close');
   }
+};
+
+const imageInputRef = ref<HTMLInputElement | null>(null);
+const deletingImage = ref<string | null>(null);
+
+const pendingImages = ref<File[]>([]);
+
+// Elimina la referencia a localImages y refresca solo si es necesario
+// (props.property.imageUrls ya es reactivo y se actualiza tras subir/eliminar)
+
+const refreshPropertyImages = async () => {
+  if (props.property) {
+    const { getCasaActions } = await import('@/modules/casas/actions/get-casa.actions');
+    const updated = await getCasaActions(props.property.id);
+    // Actualiza las imágenes directamente en la propiedad reactiva
+    props.property.imageUrls.splice(0, props.property.imageUrls.length, ...updated.imageUrls);
+  }
+};
+
+const onImageChange = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  if (!input.files) return;
+  const files = Array.from(input.files);
+  for (const file of files) {
+    if (!pendingImages.value.some(f => f.name === file.name && f.size === file.size)) {
+      pendingImages.value.push(file);
+    }
+  }
+  if (imageInputRef.value) imageInputRef.value.value = '';
+};
+
+const removePendingImage = (file: File) => {
+  const idx = pendingImages.value.findIndex(f => f.name === file.name && f.size === file.size);
+  if (idx !== -1) pendingImages.value.splice(idx, 1);
 };
 
 const handleSubmit = async () => {
@@ -276,57 +321,31 @@ const handleSubmit = async () => {
   if (form.value.contacts.length === 0) {
     return;
   }
-
   isSubmitting.value = true;
   try {
+    // Subir imágenes pendientes antes de actualizar
+    if (props.property && pendingImages.value.length > 0) {
+      for (const file of pendingImages.value) {
+        await uploadPropertyImage(props.property.id, file);
+      }
+      await refreshPropertyImages();
+    }
     // Omitir provinceId del formulario
     const { provinceId, ...dataToSubmit } = form.value;
     emit('submit', dataToSubmit);
+    // Limpiar imágenes pendientes tras submit
+    pendingImages.value = [];
+    if (imageInputRef.value) imageInputRef.value.value = '';
   } finally {
     isSubmitting.value = false;
   }
 };
 
-const selectedImageNames = ref<string[]>([]);
-const imageInputRef = ref<HTMLInputElement | null>(null);
-const deletingImage = ref<string | null>(null);
-
-const refreshPropertyImages = async () => {
-  if (props.property) {
-    // Traer la propiedad actualizada desde la API
-    const { getCasaActions } = await import('@/modules/casas/actions/get-casa.actions');
-    const updated = await getCasaActions(props.property.id);
-    // Actualizar las imágenes en el objeto property (reactividad limitada, pero forzamos update)
-    props.property.imageUrls.splice(0, props.property.imageUrls.length, ...updated.imageUrls);
-  }
-};
-
-const clearImageSelection = () => {
-  selectedImageNames.value = [];
-  if (imageInputRef.value) {
-    imageInputRef.value.value = '';
-  }
-};
-
-const onImageChange = async (event: Event) => {
-  const input = event.target as HTMLInputElement;
-  if (!input.files || !props.property) return;
-  const files = Array.from(input.files);
-  selectedImageNames.value = files.map(f => f.name);
-  for (const file of files) {
-    try {
-      await uploadPropertyImage(props.property.id, file);
-    } catch (e) {
-      // Puedes mostrar un toast aquí si tienes uno disponible
-      console.error('Error subiendo imagen', e);
-    }
-  }
-  await refreshPropertyImages();
-  // No limpiar la selección automáticamente
-};
-
 const handleDeleteImage = async (fileName: string) => {
   if (!props.property) return;
+  // Oculta la imagen inmediatamente de la galería
+  const idx = props.property.imageUrls.findIndex(img => img.fileName === fileName);
+  if (idx !== -1) props.property.imageUrls.splice(idx, 1);
   deletingImage.value = fileName;
   try {
     await deletePropertyImage(props.property.id, fileName);
