@@ -44,6 +44,17 @@ const router = createRouter({
           component: () => import('@/modules/casas/view/CasaDetails.vue'),
           props: true, // Permite pasar el parámetro `id` como prop
         },
+        {
+          path: '/mis-casas',
+          name: 'myCasas',
+          component: () => import('@/modules/casas/view/MyCasasView.vue'),
+        },
+        {
+          path: '/mis-casas/:id/editar',
+          name: 'casa-edit',
+          component: () => import('@/modules/casas/view/EditCasaView.vue'),
+          props: true,
+        },
       ],
     },
     authRouters,
