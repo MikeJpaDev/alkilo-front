@@ -10,11 +10,6 @@ const isAdminGuard = async (
 
   await authStore.checkAuthStatus();
 
-  console.log('isAdminGuard - user roles:', authStore.user?.roles);
-  if (authStore.user) {
-    next({ name: 'home' });
-  }
-
   if (authStore.user?.roles.includes('admin')) {
     next();
   } else {

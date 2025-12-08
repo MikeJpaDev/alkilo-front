@@ -4,7 +4,7 @@ import isAuthenticatedGuard from '@/modules/auth/guards/is-authenticated.guard';
 export const adminRoutes = {
   path: '/admin',
   name: 'admin',
-  beforeEnter: [isAuthenticatedGuard, isAdminGuard],
+  beforeEnter: [isAdminGuard],
   component: () => import('../layouts/AdminLayout.vue'),
   meta: { requiresAuth: true, requiresAdmin: true },
   children: [
