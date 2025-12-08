@@ -44,7 +44,7 @@
       <span>Administración</span>
     </RouterLink>
     <RouterLink
-      to="{ name: 'myCasas' }"
+      :to="{ name: 'myCasas' }"
       rel="noopener noreferrer"
       class="flex items-center flex-shrink-0 px-5 py-3 space-x-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
     >
