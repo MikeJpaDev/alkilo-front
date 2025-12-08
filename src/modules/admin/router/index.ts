@@ -1,12 +1,16 @@
+import isAdminGuard from '@/modules/auth/guards/is-admin.guard';
+import isAuthenticatedGuard from '@/modules/auth/guards/is-authenticated.guard';
+
 export const adminRoutes = {
   path: '/admin',
   name: 'admin',
+  beforeEnter: [isAuthenticatedGuard, isAdminGuard],
   component: () => import('../layouts/AdminLayout.vue'),
   meta: { requiresAuth: true, requiresAdmin: true },
   children: [
     {
       path: '',
-      redirect: '/admin/dashboard'
+      redirect: '/admin/dashboard',
     },
     {
       path: 'dashboard',
